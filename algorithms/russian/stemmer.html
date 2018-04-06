@@ -646,43 +646,42 @@ remove it and undouble н (<B><I>n</I></B>), or (3) if the word ends ь (<B><I>'
 
 <div class="highlight"><pre><span class="kd">stringescapes</span> <span class="p">{}</span>
 
-<span class="cm">/* the 33 Cyrillic letters in Unicode, and represented</span>
-<span class="cm">   in Latin characters following the conventions of the standard Library</span>
-<span class="cm">   of Congress transliteration: */</span>
+<span class="cm">/* the 33 Cyrillic letters represented in ASCII characters following the</span>
+<span class="cm"> * conventions of the standard Library of Congress transliteration: */</span>
 
-<span class="kd">stringdef</span> <span class="n">a</span>    <span class="mh">hex</span> <span class="s">&#39;430&#39;</span>
-<span class="kd">stringdef</span> <span class="n">b</span>    <span class="mh">hex</span> <span class="s">&#39;431&#39;</span>
-<span class="kd">stringdef</span> <span class="n">v</span>    <span class="mh">hex</span> <span class="s">&#39;432&#39;</span>
-<span class="kd">stringdef</span> <span class="n">g</span>    <span class="mh">hex</span> <span class="s">&#39;433&#39;</span>
-<span class="kd">stringdef</span> <span class="n">d</span>    <span class="mh">hex</span> <span class="s">&#39;434&#39;</span>
-<span class="kd">stringdef</span> <span class="n">e</span>    <span class="mh">hex</span> <span class="s">&#39;435&#39;</span>
-<span class="kd">stringdef</span> <span class="n">e&quot;</span>   <span class="mh">hex</span> <span class="s">&#39;451&#39;</span>
-<span class="kd">stringdef</span> <span class="n">zh</span>   <span class="mh">hex</span> <span class="s">&#39;436&#39;</span>
-<span class="kd">stringdef</span> <span class="n">z</span>    <span class="mh">hex</span> <span class="s">&#39;437&#39;</span>
-<span class="kd">stringdef</span> <span class="n">i</span>    <span class="mh">hex</span> <span class="s">&#39;438&#39;</span>
-<span class="kd">stringdef</span> <span class="n">i`</span>   <span class="mh">hex</span> <span class="s">&#39;439&#39;</span>
-<span class="kd">stringdef</span> <span class="n">k</span>    <span class="mh">hex</span> <span class="s">&#39;43A&#39;</span>
-<span class="kd">stringdef</span> <span class="n">l</span>    <span class="mh">hex</span> <span class="s">&#39;43B&#39;</span>
-<span class="kd">stringdef</span> <span class="n">m</span>    <span class="mh">hex</span> <span class="s">&#39;43C&#39;</span>
-<span class="kd">stringdef</span> <span class="n">n</span>    <span class="mh">hex</span> <span class="s">&#39;43D&#39;</span>
-<span class="kd">stringdef</span> <span class="n">o</span>    <span class="mh">hex</span> <span class="s">&#39;43E&#39;</span>
-<span class="kd">stringdef</span> <span class="n">p</span>    <span class="mh">hex</span> <span class="s">&#39;43F&#39;</span>
-<span class="kd">stringdef</span> <span class="n">r</span>    <span class="mh">hex</span> <span class="s">&#39;440&#39;</span>
-<span class="kd">stringdef</span> <span class="n">s</span>    <span class="mh">hex</span> <span class="s">&#39;441&#39;</span>
-<span class="kd">stringdef</span> <span class="n">t</span>    <span class="mh">hex</span> <span class="s">&#39;442&#39;</span>
-<span class="kd">stringdef</span> <span class="n">u</span>    <span class="mh">hex</span> <span class="s">&#39;443&#39;</span>
-<span class="kd">stringdef</span> <span class="n">f</span>    <span class="mh">hex</span> <span class="s">&#39;444&#39;</span>
-<span class="kd">stringdef</span> <span class="n">kh</span>   <span class="mh">hex</span> <span class="s">&#39;445&#39;</span>
-<span class="kd">stringdef</span> <span class="n">ts</span>   <span class="mh">hex</span> <span class="s">&#39;446&#39;</span>
-<span class="kd">stringdef</span> <span class="n">ch</span>   <span class="mh">hex</span> <span class="s">&#39;447&#39;</span>
-<span class="kd">stringdef</span> <span class="n">sh</span>   <span class="mh">hex</span> <span class="s">&#39;448&#39;</span>
-<span class="kd">stringdef</span> <span class="n">shch</span> <span class="mh">hex</span> <span class="s">&#39;449&#39;</span>
-<span class="kd">stringdef</span> <span class="n">&quot;</span>    <span class="mh">hex</span> <span class="s">&#39;44A&#39;</span>
-<span class="kd">stringdef</span> <span class="n">y</span>    <span class="mh">hex</span> <span class="s">&#39;44B&#39;</span>
-<span class="kd">stringdef</span> <span class="n">&#39;</span>    <span class="mh">hex</span> <span class="s">&#39;44C&#39;</span>
-<span class="kd">stringdef</span> <span class="n">e`</span>   <span class="mh">hex</span> <span class="s">&#39;44D&#39;</span>
-<span class="kd">stringdef</span> <span class="n">iu</span>   <span class="mh">hex</span> <span class="s">&#39;44E&#39;</span>
-<span class="kd">stringdef</span> <span class="n">ia</span>   <span class="mh">hex</span> <span class="s">&#39;44F&#39;</span>
+<span class="kd">stringdef</span> <span class="n">a</span>    <span class="s">&#39;{U+0430}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">b</span>    <span class="s">&#39;{U+0431}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">v</span>    <span class="s">&#39;{U+0432}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">g</span>    <span class="s">&#39;{U+0433}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">d</span>    <span class="s">&#39;{U+0434}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e</span>    <span class="s">&#39;{U+0435}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e&quot;</span>   <span class="s">&#39;{U+0451}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">zh</span>   <span class="s">&#39;{U+0436}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">z</span>    <span class="s">&#39;{U+0437}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">i</span>    <span class="s">&#39;{U+0438}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">i`</span>   <span class="s">&#39;{U+0439}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">k</span>    <span class="s">&#39;{U+043A}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">l</span>    <span class="s">&#39;{U+043B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">m</span>    <span class="s">&#39;{U+043C}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">n</span>    <span class="s">&#39;{U+043D}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">o</span>    <span class="s">&#39;{U+043E}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">p</span>    <span class="s">&#39;{U+043F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">r</span>    <span class="s">&#39;{U+0440}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">s</span>    <span class="s">&#39;{U+0441}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">t</span>    <span class="s">&#39;{U+0442}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">u</span>    <span class="s">&#39;{U+0443}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">f</span>    <span class="s">&#39;{U+0444}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">kh</span>   <span class="s">&#39;{U+0445}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ts</span>   <span class="s">&#39;{U+0446}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ch</span>   <span class="s">&#39;{U+0447}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">sh</span>   <span class="s">&#39;{U+0448}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">shch</span> <span class="s">&#39;{U+0449}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">&quot;</span>    <span class="s">&#39;{U+044A}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">y</span>    <span class="s">&#39;{U+044B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">&#39;</span>    <span class="s">&#39;{U+044C}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e`</span>   <span class="s">&#39;{U+044D}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">iu</span>   <span class="s">&#39;{U+044E}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ia</span>   <span class="s">&#39;{U+044F}&#39;</span>
 
 <span class="kd">routines</span> <span class="p">(</span> <span class="n">mark_regions</span> <span class="n">R2</span>
            <span class="n">perfective_gerund</span>
@@ -849,7 +848,7 @@ remove it and undouble н (<B><I>n</I></B>), or (3) if the word ends ь (<B><I>'
 
     <span class="c1">// Normalise {e&quot;} to {e}.  The documentation has long suggested the user</span>
     <span class="c1">// should do this before calling the stemmer - we now do it for them.</span>
-    <span class="ow">do</span> <span class="ow">repeat</span> <span class="p">(</span> <span class="ow">goto</span> <span class="p">[</span><span class="s">&#39;{e&quot;}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span> <span class="p">)</span>
+    <span class="ow">do</span> <span class="ow">repeat</span> <span class="p">(</span> <span class="ow">goto</span> <span class="p">([</span><span class="s">&#39;{e&quot;}&#39;</span><span class="p">])</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span> <span class="p">)</span>
 
     <span class="ow">do</span> <span class="n">mark_regions</span>
     <span class="ow">backwards</span> <span class="ow">setlimit</span> <span class="ow">tomark</span> <span class="n">pV</span> <span class="k">for</span> <span class="p">(</span>
