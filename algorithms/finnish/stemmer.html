@@ -357,7 +357,10 @@ So <I>V</I><B><I>i</I></B> means a <I>V</I> followed by letter <B><I>i</I></B>.
 <BR>
 Define <I>LV</I> (long vowel) as one of  &nbsp; <B><I>aa  &nbsp;  ee  &nbsp;  ii  &nbsp;  oo  &nbsp;  uu  &nbsp;  ää  &nbsp;  öö</I></B>.
 <BR>
-Define a <I>c</I> (consonant) as a character other than a <I>v</I>.
+Define a <I>c</I> (consonant) as a character from ASCII a-z which isn't in
+<I>v</I> (originally this was "a character other than a <I>v</I> but since
+2018-04-11 we've changed this definition to avoid the stemmer from altering
+sequences of digits).
 <BR>
 So <I>cv</I> means a <I>c</I> followed by a <I>v</I>.
 </p>
@@ -472,7 +475,7 @@ remove the last consonant (so <I>eläkk</I> &#x2192; <I>eläk</I>, <I>aatonaatto
 <span class="kd">integers</span> <span class="p">(</span> <span class="n">p1</span> <span class="n">p2</span> <span class="p">)</span>
 <span class="kd">strings</span> <span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
 <span class="kd">booleans</span> <span class="p">(</span> <span class="n">ending_removed</span> <span class="p">)</span>
-<span class="kd">groupings</span> <span class="p">(</span> <span class="n">AEI</span> <span class="n">V1</span> <span class="n">V2</span> <span class="n">particle_end</span> <span class="p">)</span>
+<span class="kd">groupings</span> <span class="p">(</span> <span class="n">AEI</span> <span class="n">C</span> <span class="n">V1</span> <span class="n">V2</span> <span class="n">particle_end</span> <span class="p">)</span>
 
 <span class="kd">stringescapes</span> <span class="p">{}</span>
 
@@ -482,6 +485,7 @@ remove the last consonant (so <I>eläkk</I> &#x2192; <I>eläk</I>, <I>aatonaatto
 <span class="kd">stringdef</span> <span class="n">o&quot;</span>   <span class="s">&#39;{U+00F6}&#39;</span>
 
 <span class="kd">define</span> <span class="n">AEI</span> <span class="s">&#39;a{a&quot;}ei&#39;</span>
+<span class="kd">define</span> <span class="n">C</span> <span class="s">&#39;bcdfghjklmnpqrstvwxz&#39;</span>
 <span class="kd">define</span> <span class="n">V1</span> <span class="s">&#39;aeiouy{a&quot;}{o&quot;}&#39;</span>
 <span class="kd">define</span> <span class="n">V2</span> <span class="s">&#39;aeiou{a&quot;}{o&quot;}&#39;</span>
 <span class="kd">define</span> <span class="n">particle_end</span> <span class="n">V1</span> <span class="o">+</span> <span class="s">&#39;nt&#39;</span>
@@ -564,7 +568,7 @@ remove the last consonant (so <I>eläkk</I> &#x2192; <I>eläk</I>, <I>aatonaatto
                 <span class="p">)</span>
 
             <span class="s">&#39;a&#39;</span> <span class="s">&#39;{a&quot;}&#39;</span>              <span class="c1">//-.</span>
-                     <span class="p">(</span><span class="n">V1</span> <span class="ow">non-</span><span class="n">V1</span><span class="p">)</span>    <span class="c1">// |</span>
+                     <span class="p">(</span><span class="n">V1</span> <span class="n">C</span><span class="p">)</span>    <span class="c1">// |</span>
             <span class="s">&#39;tta&#39;</span> <span class="s">&#39;tt{a&quot;}&#39;</span>          <span class="c1">// Partitive  [32]</span>
                      <span class="p">(</span><span class="s">&#39;e&#39;</span><span class="p">)</span>          <span class="c1">// |</span>
             <span class="s">&#39;ta&#39;</span> <span class="s">&#39;t{a&quot;}&#39;</span>            <span class="c1">//-&#39;</span>
@@ -620,11 +624,11 @@ remove the last consonant (so <I>eläkk</I> &#x2192; <I>eläk</I>, <I>aatonaatto
     <span class="kd">define</span> <span class="n">tidy</span> <span class="k">as</span> <span class="p">(</span>
         <span class="ow">setlimit</span> <span class="ow">tomark</span> <span class="n">p1</span> <span class="k">for</span> <span class="p">(</span>
             <span class="ow">do</span> <span class="p">(</span> <span class="n">LONG</span> <span class="ow">and</span> <span class="p">([</span><span class="ow">next</span><span class="p">]</span> <span class="ow">delete</span> <span class="p">)</span> <span class="p">)</span> <span class="c1">// undouble vowel</span>
-            <span class="ow">do</span> <span class="p">(</span> <span class="p">[</span><span class="n">AEI</span><span class="p">]</span> <span class="ow">non-</span><span class="n">V1</span> <span class="ow">delete</span> <span class="p">)</span> <span class="c1">// remove trailing a, a&quot;, e, i</span>
+            <span class="ow">do</span> <span class="p">(</span> <span class="p">[</span><span class="n">AEI</span><span class="p">]</span> <span class="n">C</span> <span class="ow">delete</span> <span class="p">)</span> <span class="c1">// remove trailing a, a&quot;, e, i</span>
             <span class="ow">do</span> <span class="p">(</span> <span class="p">[</span><span class="s">&#39;j&#39;</span><span class="p">]</span> <span class="s">&#39;o&#39;</span> <span class="ow">or</span> <span class="s">&#39;u&#39;</span> <span class="ow">delete</span> <span class="p">)</span>
             <span class="ow">do</span> <span class="p">(</span> <span class="p">[</span><span class="s">&#39;o&#39;</span><span class="p">]</span> <span class="s">&#39;j&#39;</span> <span class="ow">delete</span> <span class="p">)</span>
         <span class="p">)</span>
-        <span class="ow">goto</span> <span class="ow">non-</span><span class="n">V1</span> <span class="p">[</span><span class="ow">next</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">x</span>  <span class="n">x</span> <span class="ow">delete</span> <span class="c1">// undouble consonant</span>
+        <span class="ow">goto</span> <span class="ow">non-</span><span class="n">V1</span> <span class="p">[</span><span class="n">C</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">x</span>  <span class="n">x</span> <span class="ow">delete</span> <span class="c1">// undouble consonant</span>
     <span class="p">)</span>
 <span class="p">)</span>
 
