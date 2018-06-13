@@ -297,23 +297,21 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
 
 <span class="kd">stringescapes</span> <span class="p">{}</span>
 
-<span class="cm">/* Latin 2 */</span>
-
-<span class="kd">stringdef</span> <span class="n">a&#39;</span> <span class="mh">hex</span> <span class="s">&#39;E1&#39;</span>
-<span class="kd">stringdef</span> <span class="n">c^</span> <span class="mh">hex</span> <span class="s">&#39;E8&#39;</span>
-<span class="kd">stringdef</span> <span class="n">d^</span> <span class="mh">hex</span> <span class="s">&#39;EF&#39;</span>
-<span class="kd">stringdef</span> <span class="n">e&#39;</span> <span class="mh">hex</span> <span class="s">&#39;E9&#39;</span>
-<span class="kd">stringdef</span> <span class="n">e^</span> <span class="mh">hex</span> <span class="s">&#39;EC&#39;</span>
-<span class="kd">stringdef</span> <span class="n">i&#39;</span> <span class="mh">hex</span> <span class="s">&#39;ED&#39;</span>
-<span class="kd">stringdef</span> <span class="n">n^</span> <span class="mh">hex</span> <span class="s">&#39;F2&#39;</span>
-<span class="kd">stringdef</span> <span class="n">o&#39;</span> <span class="mh">hex</span> <span class="s">&#39;F3&#39;</span>
-<span class="kd">stringdef</span> <span class="n">r^</span> <span class="mh">hex</span> <span class="s">&#39;F8&#39;</span>
-<span class="kd">stringdef</span> <span class="n">s^</span> <span class="mh">hex</span> <span class="s">&#39;B9&#39;</span>
-<span class="kd">stringdef</span> <span class="n">t^</span> <span class="mh">hex</span> <span class="s">&#39;BB&#39;</span>
-<span class="kd">stringdef</span> <span class="n">u&#39;</span> <span class="mh">hex</span> <span class="s">&#39;FA&#39;</span>
-<span class="kd">stringdef</span> <span class="n">u*</span> <span class="mh">hex</span> <span class="s">&#39;F9&#39;</span>
-<span class="kd">stringdef</span> <span class="n">y&#39;</span> <span class="mh">hex</span> <span class="s">&#39;FD&#39;</span>
-<span class="kd">stringdef</span> <span class="n">z^</span> <span class="mh">hex</span> <span class="s">&#39;BE&#39;</span>
+<span class="kd">stringdef</span> <span class="n">a&#39;</span> <span class="s">&#39;{U+00E1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">c^</span> <span class="s">&#39;{U+010D}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">d^</span> <span class="s">&#39;{U+010F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e&#39;</span> <span class="s">&#39;{U+00E9}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e^</span> <span class="s">&#39;{U+011B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">i&#39;</span> <span class="s">&#39;{U+00ED}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">n^</span> <span class="s">&#39;{U+0148}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">o&#39;</span> <span class="s">&#39;{U+00F3}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">r^</span> <span class="s">&#39;{U+0159}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">s^</span> <span class="s">&#39;{U+0161}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">t^</span> <span class="s">&#39;{U+0165}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">u&#39;</span> <span class="s">&#39;{U+00FA}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">u*</span> <span class="s">&#39;{U+016F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">y&#39;</span> <span class="s">&#39;{U+00FD}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">z^</span> <span class="s">&#39;{U+017E}&#39;</span>
 
 <span class="kd">define</span> <span class="n">v</span> <span class="s">&#39;aeiouy{a&#39;}{e^}{e&#39;}{i&#39;}{o&#39;}{u&#39;}{u*}{y&#39;}&#39;</span>
 
@@ -323,8 +321,8 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
     <span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="ow">limit</span>
 
     <span class="ow">do</span> <span class="p">(</span>
-	<span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span> <span class="ow">setmark</span> <span class="n">pV</span>
-	<span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span> <span class="ow">gopast</span> <span class="n">v</span> <span class="ow">setmark</span> <span class="n">p1</span>
+        <span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span> <span class="ow">setmark</span> <span class="n">pV</span>
+        <span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span> <span class="ow">gopast</span> <span class="n">v</span> <span class="ow">setmark</span> <span class="n">p1</span>
     <span class="p">)</span>
 <span class="p">)</span>
 
@@ -352,8 +350,8 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
       <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
       <span class="s">&#39;in&#39;</span>
       <span class="p">(</span>
-	<span class="ow">delete</span>
-	<span class="ow">try</span> <span class="n">palatalise</span>
+        <span class="ow">delete</span>
+        <span class="ow">try</span> <span class="n">palatalise</span>
       <span class="p">)</span>
     <span class="p">)</span>
   <span class="p">)</span>
@@ -373,13 +371,13 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
       <span class="s">&#39;{e&#39;}m&#39;</span> <span class="s">&#39;{i&#39;}m&#39;</span> <span class="s">&#39;es&#39;</span>
       <span class="s">&#39;e&#39;</span> <span class="s">&#39;i&#39;</span> <span class="s">&#39;{i&#39;}&#39;</span> <span class="s">&#39;{e^}&#39;</span>
       <span class="p">(</span>
-	<span class="ow">delete</span>
-	<span class="ow">try</span> <span class="n">palatalise</span>
+        <span class="ow">delete</span>
+        <span class="ow">try</span> <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;em&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
-	<span class="ow">try</span> <span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
+        <span class="ow">try</span> <span class="n">palatalise</span>
       <span class="p">)</span>
     <span class="p">)</span>
   <span class="p">)</span>
@@ -400,29 +398,29 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
       <span class="s">&#39;i{a&#39;}n&#39;</span> <span class="s">&#39;ist&#39;</span> <span class="s">&#39;isk&#39;</span> <span class="s">&#39;i{s^}k&#39;</span> <span class="s">&#39;itb&#39;</span>
       <span class="s">&#39;ic&#39;</span> <span class="s">&#39;in&#39;</span> <span class="s">&#39;it&#39;</span> <span class="s">&#39;iv&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;enic&#39;</span> <span class="s">&#39;ec&#39;</span> <span class="s">&#39;en&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{e&#39;}{r^}&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{e&#39;}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{e&#39;}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{e^}n&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{e^}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{e^}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{i&#39;}rn&#39;</span>
       <span class="s">&#39;{i&#39;}{r^}&#39;</span> <span class="s">&#39;{i&#39;}n&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{i&#39;}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{i&#39;}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
     <span class="p">)</span>
   <span class="p">)</span>
@@ -440,8 +438,8 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
       <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
       <span class="s">&#39;izn&#39;</span> <span class="s">&#39;isk&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
     <span class="p">)</span>
   <span class="p">)</span>
@@ -457,23 +455,23 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
       <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
       <span class="s">&#39;e{c^}ek&#39;</span> <span class="s">&#39;enek&#39;</span> <span class="s">&#39;ek&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{e&#39;}{c^}ek&#39;</span> <span class="s">&#39;{e&#39;}k&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{e&#39;}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{e&#39;}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;i{c^}ek&#39;</span> <span class="s">&#39;inek&#39;</span> <span class="s">&#39;ik&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;i&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{i&#39;}{c^}ek&#39;</span> <span class="s">&#39;{i&#39;}k&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{i&#39;}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{i&#39;}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;{a&#39;}k&#39;</span>
        <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a&#39;}&#39;</span><span class="p">)</span>
@@ -490,13 +488,13 @@ And here is his implementation of Dolamic&#8217;s Czech stemmer,
     <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
       <span class="s">&#39;{e^}j{s^}&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;{e^}&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;{e^}&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
       <span class="s">&#39;ej{s^}&#39;</span>
       <span class="p">(</span>
-	<span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
-	<span class="n">palatalise</span>
+        <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
+        <span class="n">palatalise</span>
       <span class="p">)</span>
     <span class="p">)</span>
   <span class="p">)</span>
