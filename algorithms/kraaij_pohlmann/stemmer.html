@@ -118,7 +118,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 </p>
 
 <div class="highlight"><pre><span class="kd">strings</span> <span class="p">(</span> <span class="n">ch</span> <span class="p">)</span>
-<span class="kd">integers</span> <span class="p">(</span> <span class="n">x</span> <span class="n">p1</span> <span class="n">p2</span> <span class="p">)</span>
+<span class="kd">integers</span> <span class="p">(</span> <span class="n">p1</span> <span class="n">p2</span> <span class="p">)</span>
 <span class="kd">booleans</span> <span class="p">(</span> <span class="n">Y_found</span> <span class="n">stemmed</span> <span class="n">GE_removed</span> <span class="p">)</span>
 
 <span class="kd">routines</span> <span class="p">(</span>
@@ -146,8 +146,8 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
 <span class="kd">backwardmode</span> <span class="p">(</span>
 
-    <span class="kd">define</span> <span class="n">R1</span> <span class="k">as</span> <span class="p">(</span><span class="ow">setmark</span> <span class="n">x</span> <span class="o">$</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">p1</span><span class="p">)</span>
-    <span class="kd">define</span> <span class="n">R2</span> <span class="k">as</span> <span class="p">(</span><span class="ow">setmark</span> <span class="n">x</span> <span class="o">$</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="kd">define</span> <span class="n">R1</span> <span class="k">as</span> <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">&lt;=</span> <span class="ow">cursor</span><span class="p">)</span>
+    <span class="kd">define</span> <span class="n">R2</span> <span class="k">as</span> <span class="p">(</span><span class="o">$</span><span class="n">p2</span> <span class="o">&lt;=</span> <span class="ow">cursor</span><span class="p">)</span>
 
     <span class="kd">define</span> <span class="n">V</span>  <span class="k">as</span> <span class="ow">test</span> <span class="p">(</span><span class="n">v</span> <span class="ow">or</span> <span class="s">&#39;ij&#39;</span><span class="p">)</span>
     <span class="kd">define</span> <span class="n">VX</span> <span class="k">as</span> <span class="ow">test</span> <span class="p">(</span><span class="ow">next</span> <span class="n">v</span> <span class="ow">or</span> <span class="s">&#39;ij&#39;</span><span class="p">)</span>

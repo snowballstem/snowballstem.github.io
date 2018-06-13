@@ -181,8 +181,6 @@ Conference
 <span class="kd">stringdef</span> <span class="n">s,</span>	<span class="s">&#39;{U+015F}&#39;</span>	<span class="c1">// LATIN SMALL LETTER S WITH CEDILLA</span>
 <span class="kd">stringdef</span> <span class="n">u&quot;</span>  	<span class="s">&#39;{U+00FC}&#39;</span>	<span class="c1">// LATIN SMALL LETTER U WITH DIAERESIS</span>
 
-<span class="kd">integers</span> 	<span class="p">(</span> <span class="n">strlen</span> <span class="p">)</span>	<span class="c1">// length of a string</span>
-
 <span class="kd">booleans</span>	<span class="p">(</span> <span class="n">continue_stemming_noun_suffixes</span> <span class="p">)</span>
 
 <span class="kd">groupings</span> 	<span class="p">(</span> <span class="n">vowel</span> <span class="n">U</span> <span class="n">vowel1</span> <span class="n">vowel2</span> <span class="n">vowel3</span> <span class="n">vowel4</span> <span class="n">vowel5</span> <span class="n">vowel6</span><span class="p">)</span>
@@ -534,6 +532,9 @@ Conference
 		<span class="p">(</span><span class="ow">test</span><span class="p">((</span><span class="ow">goto</span> <span class="n">vowel</span><span class="p">)</span> <span class="s">&#39;{o&quot;}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{u&quot;}&#39;</span><span class="p">)</span> <span class="o">&lt;+</span> <span class="s">&#39;{u&quot;}&#39;</span><span class="p">)</span>
 	<span class="p">)</span>
 
+	<span class="kd">define</span> <span class="n">is_reserved_word</span> <span class="k">as</span> <span class="p">(</span>
+		<span class="s">&#39;ad&#39;</span> <span class="ow">try</span> <span class="s">&#39;soy&#39;</span> <span class="ow">atlimit</span>
+	<span class="p">)</span>
 <span class="p">)</span>
 
 <span class="c1">// Tests if there are more than one syllables</span>
@@ -542,15 +543,9 @@ Conference
 	<span class="ow">test</span> <span class="p">(</span><span class="ow">atleast</span> <span class="m">2</span> <span class="p">(</span><span class="ow">gopast</span> <span class="n">vowel</span><span class="p">))</span>
 <span class="p">)</span>
 
-<span class="kd">define</span> <span class="n">is_reserved_word</span> <span class="k">as</span> <span class="p">(</span>
-	<span class="ow">test</span><span class="p">(</span><span class="ow">gopast</span> <span class="s">&#39;ad&#39;</span> <span class="p">(</span><span class="o">$</span><span class="n">strlen</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span> <span class="p">(</span><span class="o">$</span><span class="n">strlen</span> <span class="o">==</span> <span class="ow">limit</span><span class="p">))</span>
-	<span class="ow">or</span>
-	<span class="ow">test</span><span class="p">(</span><span class="ow">gopast</span> <span class="s">&#39;soyad&#39;</span> <span class="p">(</span><span class="o">$</span><span class="n">strlen</span> <span class="o">=</span> <span class="m">5</span><span class="p">)</span> <span class="p">(</span><span class="o">$</span><span class="n">strlen</span> <span class="o">==</span> <span class="ow">limit</span><span class="p">))</span>
-<span class="p">)</span>
-
 <span class="kd">define</span> <span class="n">postlude</span> <span class="k">as</span> <span class="p">(</span>
-	<span class="ow">not</span><span class="p">(</span><span class="n">is_reserved_word</span><span class="p">)</span>
 	<span class="ow">backwards</span> <span class="p">(</span>
+		<span class="ow">not</span><span class="p">(</span><span class="n">is_reserved_word</span><span class="p">)</span>
 		<span class="ow">do</span> <span class="n">append_U_to_stems_ending_with_d_or_g</span>
 		<span class="ow">do</span> <span class="n">post_process_last_consonants</span>
 
