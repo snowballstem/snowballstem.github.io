@@ -163,7 +163,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_1</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
 
             <span class="s">&#39;{&#39;}s&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
             <span class="s">&#39;s&#39;</span>    <span class="p">(</span><span class="n">R1</span> <span class="ow">not</span> <span class="p">(</span><span class="s">&#39;t&#39;</span> <span class="n">R1</span><span class="p">)</span> <span class="n">C</span> <span class="ow">delete</span><span class="p">)</span>
@@ -185,7 +185,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_2</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;je&#39;</span>   <span class="p">((</span><span class="s">&#39;{&#39;}t&#39;</span> <span class="p">]</span> <span class="ow">delete</span><span class="p">)</span> <span class="ow">or</span>
                     <span class="p">(</span><span class="s">&#39;et&#39;</span>   <span class="p">]</span> <span class="n">R1</span> <span class="n">C</span> <span class="ow">delete</span><span class="p">)</span> <span class="ow">or</span>
                     <span class="p">(</span><span class="s">&#39;rnt&#39;</span>  <span class="p">]</span> <span class="o">&lt;-</span><span class="s">&#39;rn&#39;</span><span class="p">)</span> <span class="ow">or</span>
@@ -209,7 +209,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_3</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;atie&#39;</span>  <span class="p">(</span><span class="n">R1</span> <span class="o">&lt;-</span><span class="s">&#39;eer&#39;</span><span class="p">)</span>
             <span class="s">&#39;iteit&#39;</span> <span class="p">(</span><span class="n">R1</span> <span class="ow">delete</span> <span class="n">lengthen_V</span><span class="p">)</span>
             <span class="s">&#39;heid&#39;</span>
@@ -229,7 +229,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_4</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">(</span>   <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">(</span>   <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
                 <span class="s">&#39;ioneel&#39;</span>  <span class="p">(</span><span class="n">R1</span> <span class="o">&lt;-</span><span class="s">&#39;ie&#39;</span><span class="p">)</span>
                 <span class="s">&#39;atief&#39;</span>   <span class="p">(</span><span class="n">R1</span> <span class="o">&lt;-</span><span class="s">&#39;eer&#39;</span><span class="p">)</span>
                 <span class="s">&#39;baar&#39;</span>    <span class="p">(</span><span class="n">R1</span> <span class="ow">delete</span><span class="p">)</span>
@@ -249,7 +249,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="ow">or</span>
-        <span class="p">(</span>   <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">(</span>   <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
                 <span class="s">&#39;iger&#39;</span>
                 <span class="s">&#39;igst&#39;</span>
                 <span class="s">&#39;ig&#39;</span>      <span class="p">(</span><span class="n">R1</span> <span class="n">C</span> <span class="ow">delete</span> <span class="n">lengthen_V</span><span class="p">)</span>
@@ -259,7 +259,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_7</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;kt&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;k&#39;</span><span class="p">)</span>
             <span class="s">&#39;ft&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;f&#39;</span><span class="p">)</span>
             <span class="s">&#39;pt&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
@@ -268,7 +268,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_6</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(])</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;bb&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
             <span class="s">&#39;cc&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;c&#39;</span><span class="p">)</span>
             <span class="s">&#39;dd&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
@@ -296,7 +296,7 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 
     <span class="kd">define</span> <span class="n">Step_1c</span> <span class="k">as</span>
     <span class="p">(</span>
-        <span class="p">[</span><span class="k">among</span> <span class="p">(</span> <span class="p">(]</span> <span class="n">R1</span> <span class="n">C</span><span class="p">)</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span> <span class="p">(</span><span class="n">R1</span> <span class="n">C</span><span class="p">)</span>
             <span class="s">&#39;d&#39;</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="s">&#39;n&#39;</span> <span class="n">R1</span><span class="p">)</span> <span class="ow">delete</span><span class="p">)</span>
             <span class="s">&#39;t&#39;</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="s">&#39;h&#39;</span> <span class="n">R1</span><span class="p">)</span> <span class="ow">delete</span><span class="p">)</span>
         <span class="p">)</span>
