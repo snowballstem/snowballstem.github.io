@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>Greek stemming algorithm - Snowball</title>
+    <link href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="/" class="pull-left"><img src="/snub-dodecahedron.gif" style="margin: 4px; height: 42px;"></a>
+          <a class="navbar-brand" href="/">Snowball</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/credits.html">Credits</a></li>
+          </ul>
+	  <span id="forkongithub"><a href="https://github.com/snowballstem/snowball">Fork me on GitHub</a></span>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          
+        </div>
+        <div class="col-md-10">
+          <h1>Greek stemming algorithm</h1>
+
+
+<h2>Links to resources</h2>
+
+<ul>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball/master/algorithms/greek.sbl">The stemmer in Snowball</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/greek/voc.txt">Sample Greek vocabulary</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/greek/output.txt">Its stemmed equivalent</a></li>
+<li> <a href="https://sais.se/mthprize/2007/ntais2007.pdf">Ntais, Georgios. Development of a Stemmer for the Greek Language</a>
+<li> <a href="https://tampub.uta.fi/bitstream/handle/10024/80480/gradu03463.pdf">Saroukos, Spyridon. Enhancing a Greek language stemmer</a>
+</ul>
+
+<p>This is an implementation of the stemmer described in: </p>
+
+<blockquote>
+    Ntais, Georgios. Development of a Stemmer for the Greek Language. <i>Diss. Royal Institute of Technology, 2006.</i>
+</blockquote>
+
+<p>with additional improvements from: </p>
+
+<blockquote>
+    Saroukos, Spyridon. Enhancing a Greek language stemmer. <i>University of Tampere, 2008.</i>
+</blockquote>
+
+<h2>The full algorithm in Snowball</h2>
+
+<div class="highlight"><pre><span class="c1">// A stemmer for Modern Greek language, based on:</span>
+<span class="c1">//</span>
+<span class="c1">// Ntais, Georgios. Development of a Stemmer for the Greek</span>
+<span class="c1">// Language. Diss. Royal Institute of Technology, 2006.</span>
+<span class="c1">// http://sais.se/mthprize/2007/ntais2007.pdf</span>
+<span class="c1">//</span>
+<span class="c1">// Saroukos, Spyridon. Enhancing a Greek language stemmer.</span>
+<span class="c1">// University of Tampere, 2008.</span>
+<span class="c1">// http://tampub.uta.fi/bitstream/handle/10024/80480/gradu03463.pdf</span>
+
+<span class="kd">stringescapes</span> <span class="p">{}</span>
+
+<span class="kd">stringdef</span> <span class="n">a</span>    <span class="s">&#39;{U+03B1}&#39;</span> <span class="c1">// alpha</span>
+<span class="kd">stringdef</span> <span class="n">v</span>    <span class="s">&#39;{U+03B2}&#39;</span> <span class="c1">// beta</span>
+<span class="kd">stringdef</span> <span class="n">g</span>    <span class="s">&#39;{U+03B3}&#39;</span> <span class="c1">// gamma</span>
+<span class="kd">stringdef</span> <span class="n">d</span>    <span class="s">&#39;{U+03B4}&#39;</span> <span class="c1">// delta</span>
+<span class="kd">stringdef</span> <span class="n">e</span>    <span class="s">&#39;{U+03B5}&#39;</span> <span class="c1">// epsilon</span>
+<span class="kd">stringdef</span> <span class="n">z</span>    <span class="s">&#39;{U+03B6}&#39;</span> <span class="c1">// zeta</span>
+<span class="kd">stringdef</span> <span class="n">i</span>    <span class="s">&#39;{U+03B7}&#39;</span> <span class="c1">// eta</span>
+<span class="kd">stringdef</span> <span class="n">th</span>   <span class="s">&#39;{U+03B8}&#39;</span> <span class="c1">// theta</span>
+<span class="kd">stringdef</span> <span class="n">y</span>    <span class="s">&#39;{U+03B9}&#39;</span> <span class="c1">// iota</span>
+<span class="kd">stringdef</span> <span class="n">k</span>    <span class="s">&#39;{U+03BA}&#39;</span> <span class="c1">// kappa</span>
+<span class="kd">stringdef</span> <span class="n">l</span>    <span class="s">&#39;{U+03BB}&#39;</span> <span class="c1">// lamda</span>
+<span class="kd">stringdef</span> <span class="n">m</span>    <span class="s">&#39;{U+03BC}&#39;</span> <span class="c1">// mu</span>
+<span class="kd">stringdef</span> <span class="n">n</span>    <span class="s">&#39;{U+03BD}&#39;</span> <span class="c1">// nu</span>
+<span class="kd">stringdef</span> <span class="n">x</span>    <span class="s">&#39;{U+03BE}&#39;</span> <span class="c1">// xi</span>
+<span class="kd">stringdef</span> <span class="n">o</span>    <span class="s">&#39;{U+03BF}&#39;</span> <span class="c1">// omicron</span>
+<span class="kd">stringdef</span> <span class="n">p</span>    <span class="s">&#39;{U+03C0}&#39;</span> <span class="c1">// pi</span>
+<span class="kd">stringdef</span> <span class="n">r</span>    <span class="s">&#39;{U+03C1}&#39;</span> <span class="c1">// rho</span>
+<span class="kd">stringdef</span> <span class="n">ss</span>   <span class="s">&#39;{U+03C2}&#39;</span> <span class="c1">// sigma final</span>
+<span class="kd">stringdef</span> <span class="n">s</span>    <span class="s">&#39;{U+03C3}&#39;</span> <span class="c1">// sigma</span>
+<span class="kd">stringdef</span> <span class="n">t</span>    <span class="s">&#39;{U+03C4}&#39;</span> <span class="c1">// tau</span>
+<span class="kd">stringdef</span> <span class="n">u</span>    <span class="s">&#39;{U+03C5}&#39;</span> <span class="c1">// upsilon</span>
+<span class="kd">stringdef</span> <span class="n">f</span>    <span class="s">&#39;{U+03C6}&#39;</span> <span class="c1">// phi</span>
+<span class="kd">stringdef</span> <span class="n">ch</span>   <span class="s">&#39;{U+03C7}&#39;</span> <span class="c1">// chi</span>
+<span class="kd">stringdef</span> <span class="n">ps</span>   <span class="s">&#39;{U+03C8}&#39;</span> <span class="c1">// psi</span>
+<span class="kd">stringdef</span> <span class="n">oo</span>   <span class="s">&#39;{U+03C9}&#39;</span> <span class="c1">// omega</span>
+
+<span class="kd">stringdef</span> <span class="n">A</span>    <span class="s">&#39;{U+0391}&#39;</span> <span class="c1">// Alpha</span>
+<span class="kd">stringdef</span> <span class="n">V</span>    <span class="s">&#39;{U+0392}&#39;</span> <span class="c1">// Beta</span>
+<span class="kd">stringdef</span> <span class="n">G</span>    <span class="s">&#39;{U+0393}&#39;</span> <span class="c1">// Gamma</span>
+<span class="kd">stringdef</span> <span class="n">D</span>    <span class="s">&#39;{U+0394}&#39;</span> <span class="c1">// Delta</span>
+<span class="kd">stringdef</span> <span class="n">E</span>    <span class="s">&#39;{U+0395}&#39;</span> <span class="c1">// Epsilon</span>
+<span class="kd">stringdef</span> <span class="n">Z</span>    <span class="s">&#39;{U+0396}&#39;</span> <span class="c1">// Zeta</span>
+<span class="kd">stringdef</span> <span class="n">I</span>    <span class="s">&#39;{U+0397}&#39;</span> <span class="c1">// Eta</span>
+<span class="kd">stringdef</span> <span class="n">Th</span>   <span class="s">&#39;{U+0398}&#39;</span> <span class="c1">// Theta</span>
+<span class="kd">stringdef</span> <span class="n">Y</span>    <span class="s">&#39;{U+0399}&#39;</span> <span class="c1">// Iota</span>
+<span class="kd">stringdef</span> <span class="n">K</span>    <span class="s">&#39;{U+039A}&#39;</span> <span class="c1">// Kappa</span>
+<span class="kd">stringdef</span> <span class="n">L</span>    <span class="s">&#39;{U+039B}&#39;</span> <span class="c1">// Lamda</span>
+<span class="kd">stringdef</span> <span class="n">M</span>    <span class="s">&#39;{U+039C}&#39;</span> <span class="c1">// Mu</span>
+<span class="kd">stringdef</span> <span class="n">N</span>    <span class="s">&#39;{U+039D}&#39;</span> <span class="c1">// Nu</span>
+<span class="kd">stringdef</span> <span class="n">X</span>    <span class="s">&#39;{U+039E}&#39;</span> <span class="c1">// Xi</span>
+<span class="kd">stringdef</span> <span class="n">O</span>    <span class="s">&#39;{U+039F}&#39;</span> <span class="c1">// Omicron</span>
+<span class="kd">stringdef</span> <span class="n">P</span>    <span class="s">&#39;{U+03A0}&#39;</span> <span class="c1">// Pi</span>
+<span class="kd">stringdef</span> <span class="n">R</span>    <span class="s">&#39;{U+03A1}&#39;</span> <span class="c1">// Rho</span>
+<span class="kd">stringdef</span> <span class="n">S</span>    <span class="s">&#39;{U+03A3}&#39;</span> <span class="c1">// Sigma</span>
+<span class="kd">stringdef</span> <span class="n">T</span>    <span class="s">&#39;{U+03A4}&#39;</span> <span class="c1">// Tau</span>
+<span class="kd">stringdef</span> <span class="n">U</span>    <span class="s">&#39;{U+03A5}&#39;</span> <span class="c1">// Upsilon</span>
+<span class="kd">stringdef</span> <span class="n">F</span>    <span class="s">&#39;{U+03A6}&#39;</span> <span class="c1">// Phi</span>
+<span class="kd">stringdef</span> <span class="n">Ch</span>   <span class="s">&#39;{U+03A7}&#39;</span> <span class="c1">// Chi</span>
+<span class="kd">stringdef</span> <span class="n">Ps</span>   <span class="s">&#39;{U+03A8}&#39;</span> <span class="c1">// Psi</span>
+<span class="kd">stringdef</span> <span class="n">Oo</span>   <span class="s">&#39;{U+03A9}&#39;</span> <span class="c1">// Omega</span>
+
+<span class="kd">stringdef</span> <span class="n">Y:</span>   <span class="s">&#39;{U+03AA}&#39;</span> <span class="c1">// Iota with dialytika</span>
+<span class="kd">stringdef</span> <span class="n">U:</span>   <span class="s">&#39;{U+03AB}&#39;</span> <span class="c1">// Upsilon with dialytika</span>
+
+<span class="kd">stringdef</span> <span class="n">a&#39;</span>   <span class="s">&#39;{U+03AC}&#39;</span> <span class="c1">// alpha with tonos</span>
+<span class="kd">stringdef</span> <span class="n">e&#39;</span>   <span class="s">&#39;{U+03AD}&#39;</span> <span class="c1">// epsilon with tonos</span>
+<span class="kd">stringdef</span> <span class="n">i&#39;</span>   <span class="s">&#39;{U+03AE}&#39;</span> <span class="c1">// eta with tonos</span>
+<span class="kd">stringdef</span> <span class="n">y&#39;</span>   <span class="s">&#39;{U+03AF}&#39;</span> <span class="c1">// iota with tonos</span>
+<span class="kd">stringdef</span> <span class="n">o&#39;</span>   <span class="s">&#39;{U+03CC}&#39;</span> <span class="c1">// omicron with tonos</span>
+<span class="kd">stringdef</span> <span class="n">u&#39;</span>   <span class="s">&#39;{U+03CD}&#39;</span> <span class="c1">// upsilon with tonos</span>
+<span class="kd">stringdef</span> <span class="n">oo&#39;</span>  <span class="s">&#39;{U+03CE}&#39;</span> <span class="c1">// omega with tonos</span>
+
+<span class="kd">stringdef</span> <span class="n">i:&#39;</span>  <span class="s">&#39;{U+0390}&#39;</span> <span class="c1">// iota with dialytika and tonos</span>
+<span class="kd">stringdef</span> <span class="n">u:&#39;</span>  <span class="s">&#39;{U+03B0}&#39;</span> <span class="c1">// upsilon with dialytika and tonos</span>
+
+<span class="kd">stringdef</span> <span class="n">i:</span>   <span class="s">&#39;{U+03CA}&#39;</span> <span class="c1">// iota with dialytika</span>
+<span class="kd">stringdef</span> <span class="n">u:</span>   <span class="s">&#39;{U+03CB}&#39;</span> <span class="c1">// upsilon with dialytika</span>
+
+<span class="kd">stringdef</span> <span class="n">A&#39;</span>   <span class="s">&#39;{U+0386}&#39;</span> <span class="c1">// Alpha with tonos</span>
+<span class="kd">stringdef</span> <span class="n">E&#39;</span>   <span class="s">&#39;{U+0388}&#39;</span> <span class="c1">// Epsilon with tonos</span>
+<span class="kd">stringdef</span> <span class="n">I&#39;</span>   <span class="s">&#39;{U+0389}&#39;</span> <span class="c1">// Eta with tonos</span>
+<span class="kd">stringdef</span> <span class="n">Y&#39;</span>   <span class="s">&#39;{U+038A}&#39;</span> <span class="c1">// Iota with tonos</span>
+<span class="kd">stringdef</span> <span class="n">O&#39;</span>   <span class="s">&#39;{U+038C}&#39;</span> <span class="c1">// Omicron with tonos</span>
+<span class="kd">stringdef</span> <span class="n">U&#39;</span>   <span class="s">&#39;{U+038E}&#39;</span> <span class="c1">// Upsilon with tonos</span>
+<span class="kd">stringdef</span> <span class="n">OO&#39;</span>  <span class="s">&#39;{U+038F}&#39;</span> <span class="c1">// Omega with tonos</span>
+
+<span class="kd">externals</span> <span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
+
+<span class="kd">booleans</span> <span class="p">(</span> <span class="n">test1</span> <span class="p">)</span>
+
+<span class="kd">groupings</span> <span class="p">(</span> <span class="n">v</span> <span class="n">v2</span> <span class="p">)</span>
+
+<span class="kd">routines</span> <span class="p">(</span> <span class="n">tolower</span> <span class="n">has_min_length</span>
+           <span class="n">steps1</span> <span class="n">steps2</span> <span class="n">steps3</span> <span class="n">steps4</span> <span class="n">steps5</span> <span class="n">steps6</span> <span class="n">steps7</span>
+           <span class="n">steps8</span> <span class="n">steps9</span> <span class="n">steps10</span>
+           <span class="n">step1</span> <span class="n">step2a</span> <span class="n">step2b</span> <span class="n">step2c</span> <span class="n">step2d</span> <span class="n">step3</span> <span class="n">step4</span>
+           <span class="n">step5a</span> <span class="n">step5b</span> <span class="n">step5c</span> <span class="n">step5d</span> <span class="n">step5e</span> <span class="n">step5f</span>
+           <span class="n">step5g</span> <span class="n">step5h</span> <span class="n">step5i</span>
+           <span class="n">step5j</span> <span class="n">step5k</span> <span class="n">step5l</span> <span class="n">step5m</span>
+           <span class="n">step6</span> <span class="n">step7</span> <span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">v</span> <span class="s">&#39;{a}{e}{i}{y}{o}{u}{oo}&#39;</span>
+<span class="kd">define</span> <span class="n">v2</span> <span class="s">&#39;{a}{e}{i}{y}{o}{oo}&#39;</span>
+
+<span class="kd">strings</span> <span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+
+<span class="kd">backwardmode</span> <span class="p">(</span>
+  <span class="kd">define</span> <span class="n">has_min_length</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="o">$</span><span class="p">(</span><span class="n">len</span> <span class="o">&gt;=</span> <span class="m">3</span><span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">tolower</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">repeat</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{A}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{V}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{v}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{G}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{g}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{D}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{d}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{E}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Z}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{z}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{I}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{i}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Th}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{th}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Y}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{K}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{k}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{L}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{l}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{M}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{m}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{N}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{n}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{X}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{x}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{O}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{o}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{P}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{p}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{R}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{r}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{S}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{s}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{T}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{t}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{U}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{F}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{f}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Ch}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{ch}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Ps}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{ps}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Oo}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{oo}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Y:}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{U:}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{a&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{e&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{i&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{i}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{y&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{o&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{o}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{u&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{oo&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{oo}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{i:&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{i}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{u:&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{i:}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{i}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{u:}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{A&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{E&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{I&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{i}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{Y&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{O&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{o}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{U&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{u}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{OO&#39;}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{oo}&#39;</span><span class="p">)</span>
+        <span class="s">&#39;{ss}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{s}&#39;</span><span class="p">)</span>
+         <span class="s">&#39;&#39;</span> <span class="p">(</span><span class="ow">next</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step1</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{f}{a}{g}{y}{a}&#39;</span> <span class="s">&#39;{f}{a}{g}{y}{o}{u}&#39;</span> <span class="s">&#39;{f}{a}{g}{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{f}{a}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{s}{k}{a}{g}{y}{a}&#39;</span> <span class="s">&#39;{s}{k}{a}{g}{y}{o}{u}&#39;</span> <span class="s">&#39;{s}{k}{a}{g}{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{s}{k}{a}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{o}{l}{o}{g}{y}{o}{u}&#39;</span> <span class="s">&#39;{o}{l}{o}{g}{y}{a}&#39;</span> <span class="s">&#39;{o}{l}{o}{g}{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{o}{l}{o}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{s}{o}{g}{y}{o}{u}&#39;</span> <span class="s">&#39;{s}{o}{g}{y}{a}&#39;</span> <span class="s">&#39;{s}{o}{g}{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{s}{o}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{t}{a}{t}{o}{g}{y}{a}&#39;</span> <span class="s">&#39;{t}{a}{t}{o}{g}{y}{o}{u}&#39;</span> <span class="s">&#39;{t}{a}{t}{o}{g}{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{t}{a}{t}{o}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{k}{r}{e}{a}{s}&#39;</span> <span class="s">&#39;{k}{r}{e}{a}{t}{o}{s}&#39;</span> <span class="s">&#39;{k}{r}{e}{a}{t}{a}&#39;</span> <span class="s">&#39;{k}{r}{e}{a}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{k}{r}{e}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{p}{e}{r}{a}{s}&#39;</span> <span class="s">&#39;{p}{e}{r}{a}{t}{o}{s}&#39;</span> <span class="s">&#39;{p}{e}{r}{a}{t}{i}&#39;</span> <span class="s">&#39;{p}{e}{r}{a}{t}{a}&#39;</span> <span class="s">&#39;{p}{e}{r}{a}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{p}{e}{r}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{t}{e}{r}{a}{s}&#39;</span> <span class="s">&#39;{t}{e}{r}{a}{t}{o}{s}&#39;</span> <span class="s">&#39;{t}{e}{r}{a}{t}{a}&#39;</span> <span class="s">&#39;{t}{e}{r}{a}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{t}{e}{r}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{f}{oo}{s}&#39;</span> <span class="s">&#39;{f}{oo}{t}{o}{s}&#39;</span> <span class="s">&#39;{f}{oo}{t}{a}&#39;</span> <span class="s">&#39;{f}{oo}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{f}{oo}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{k}{a}{th}{e}{s}{t}{oo}{s}&#39;</span> <span class="s">&#39;{k}{a}{th}{e}{s}{t}{oo}{t}{o}{s}&#39;</span> <span class="s">&#39;{k}{a}{th}{e}{s}{t}{oo}{t}{a}&#39;</span> <span class="s">&#39;{k}{a}{th}{e}{s}{t}{oo}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{k}{a}{th}{e}{s}{t}&#39;</span><span class="p">)</span>
+      <span class="s">&#39;{g}{e}{g}{o}{n}{o}{s}&#39;</span> <span class="s">&#39;{g}{e}{g}{o}{n}{o}{t}{o}{s}&#39;</span> <span class="s">&#39;{g}{e}{g}{o}{n}{o}{t}{a}&#39;</span> <span class="s">&#39;{g}{e}{g}{o}{n}{o}{t}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{g}{e}{g}{o}{n}&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps1</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{z}{a}&#39;</span> <span class="s">&#39;{y}{z}{e}{s}&#39;</span> <span class="s">&#39;{y}{z}{e}&#39;</span> <span class="s">&#39;{y}{z}{a}{m}{e}&#39;</span> <span class="s">&#39;{y}{z}{a}{t}{e}&#39;</span> <span class="s">&#39;{y}{z}{a}{n}&#39;</span> <span class="s">&#39;{y}{z}{a}{n}{e}&#39;</span> <span class="s">&#39;{y}{z}{oo}&#39;</span> <span class="s">&#39;{y}{z}{e}{y}{s}&#39;</span> <span class="s">&#39;{y}{z}{e}{y}&#39;</span>
+      <span class="s">&#39;{y}{z}{o}{u}{m}{e}&#39;</span> <span class="s">&#39;{y}{z}{e}{t}{e}&#39;</span> <span class="s">&#39;{y}{z}{o}{u}{n}&#39;</span> <span class="s">&#39;{y}{z}{o}{u}{n}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{n}{a}{m}{p}{a}&#39;</span> <span class="s">&#39;{e}{m}{p}{a}&#39;</span> <span class="s">&#39;{e}{p}{a}&#39;</span> <span class="s">&#39;{x}{a}{n}{a}{p}{a}&#39;</span> <span class="s">&#39;{p}{a}&#39;</span> <span class="s">&#39;{p}{e}{r}{y}{p}{a}&#39;</span> <span class="s">&#39;{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{s}{u}{n}{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{d}{a}{n}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{m}{a}{r}{k}&#39;</span> <span class="s">&#39;{k}{o}{r}{n}&#39;</span> <span class="s">&#39;{a}{m}{p}{a}{r}&#39;</span> <span class="s">&#39;{a}{r}{r}&#39;</span> <span class="s">&#39;{v}{a}{th}{u}{r}{y}&#39;</span> <span class="s">&#39;{v}{a}{r}{k}&#39;</span> <span class="s">&#39;{v}&#39;</span> <span class="s">&#39;{v}{o}{l}{v}{o}{r}&#39;</span> <span class="s">&#39;{g}{k}{r}&#39;</span>
+          <span class="s">&#39;{g}{l}{u}{k}{o}{r}&#39;</span> <span class="s">&#39;{g}{l}{u}{k}{u}{r}&#39;</span> <span class="s">&#39;{y}{m}{p}&#39;</span> <span class="s">&#39;{l}&#39;</span> <span class="s">&#39;{l}{o}{u}&#39;</span> <span class="s">&#39;{m}{a}{r}&#39;</span> <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{p}{r}&#39;</span> <span class="s">&#39;{m}{p}{r}&#39;</span> <span class="s">&#39;{p}{o}{l}{u}{r}&#39;</span> <span class="s">&#39;{p}&#39;</span>
+          <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{p}{y}{p}{e}{r}{o}{r}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{z}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps2</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{oo}{th}{i}{k}{a}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{e}{s}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{e}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{a}{m}{e}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{a}{t}{e}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{a}{n}&#39;</span> <span class="s">&#39;{oo}{th}{i}{k}{a}{n}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{l}&#39;</span> <span class="s">&#39;{v}{y}&#39;</span> <span class="s">&#39;{e}{n}&#39;</span> <span class="s">&#39;{u}{ps}&#39;</span> <span class="s">&#39;{l}{y}&#39;</span> <span class="s">&#39;{z}{oo}&#39;</span> <span class="s">&#39;{s}&#39;</span> <span class="s">&#39;{ch}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{oo}{n}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps3</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{s}{a}&#39;</span> <span class="s">&#39;{y}{s}{e}{s}&#39;</span> <span class="s">&#39;{y}{s}{e}&#39;</span> <span class="s">&#39;{y}{s}{a}{m}{e}&#39;</span> <span class="s">&#39;{y}{s}{a}{t}{e}&#39;</span> <span class="s">&#39;{y}{s}{a}{n}&#39;</span> <span class="s">&#39;{y}{s}{a}{n}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">(</span><span class="s">&#39;{y}{s}{a}&#39;</span> <span class="ow">atlimit</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{s}&#39;</span><span class="p">)</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{n}{a}{m}{p}{a}&#39;</span> <span class="s">&#39;{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{e}{m}{p}{a}&#39;</span> <span class="s">&#39;{e}{s}{e}&#39;</span> <span class="s">&#39;{e}{s}{oo}{k}{l}{e}&#39;</span> <span class="s">&#39;{e}{p}{a}&#39;</span> <span class="s">&#39;{x}{a}{n}{a}{p}{a}&#39;</span> <span class="s">&#39;{e}{p}{e}&#39;</span> <span class="s">&#39;{p}{e}{r}{y}{p}{a}&#39;</span>
+          <span class="s">&#39;{s}{u}{n}{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{d}{a}{n}{e}&#39;</span> <span class="s">&#39;{k}{l}{e}&#39;</span> <span class="s">&#39;{ch}{a}{r}{t}{o}{p}{a}&#39;</span> <span class="s">&#39;{e}{x}{a}{r}{ch}{a}&#39;</span> <span class="s">&#39;{m}{e}{t}{e}{p}{e}&#39;</span> <span class="s">&#39;{a}{p}{o}{k}{l}{e}&#39;</span>
+          <span class="s">&#39;{a}{p}{e}{k}{l}{e}&#39;</span> <span class="s">&#39;{e}{k}{l}{e}&#39;</span> <span class="s">&#39;{p}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{n}&#39;</span> <span class="s">&#39;{a}{f}&#39;</span> <span class="s">&#39;{g}{e}&#39;</span> <span class="s">&#39;{g}{y}{g}{a}{n}{t}{o}{a}{f}&#39;</span> <span class="s">&#39;{g}{k}{e}&#39;</span> <span class="s">&#39;{d}{i}{m}{o}{k}{r}{a}{t}&#39;</span> <span class="s">&#39;{k}{o}{m}&#39;</span> <span class="s">&#39;{g}{k}&#39;</span> <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{p}&#39;</span>
+          <span class="s">&#39;{p}{o}{u}{k}{a}{m}&#39;</span> <span class="s">&#39;{o}{l}{o}&#39;</span> <span class="s">&#39;{l}{a}{r}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps4</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{s}{oo}&#39;</span> <span class="s">&#39;{y}{s}{e}{y}{s}&#39;</span> <span class="s">&#39;{y}{s}{e}{y}&#39;</span> <span class="s">&#39;{y}{s}{o}{u}{m}{e}&#39;</span> <span class="s">&#39;{y}{s}{e}{t}{e}&#39;</span> <span class="s">&#39;{y}{s}{o}{u}{n}&#39;</span> <span class="s">&#39;{y}{s}{o}{u}{n}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{n}{a}{m}{p}{a}&#39;</span> <span class="s">&#39;{e}{m}{p}{a}&#39;</span> <span class="s">&#39;{e}{s}{e}&#39;</span> <span class="s">&#39;{e}{s}{oo}{k}{l}{e}&#39;</span> <span class="s">&#39;{e}{p}{a}&#39;</span> <span class="s">&#39;{x}{a}{n}{a}{p}{a}&#39;</span> <span class="s">&#39;{e}{p}{e}&#39;</span> <span class="s">&#39;{p}{e}{r}{y}{p}{a}&#39;</span> <span class="s">&#39;{a}{th}{r}{o}&#39;</span>
+          <span class="s">&#39;{s}{u}{n}{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{d}{a}{n}{e}&#39;</span> <span class="s">&#39;{k}{l}{e}&#39;</span> <span class="s">&#39;{ch}{a}{r}{t}{o}{p}{a}&#39;</span> <span class="s">&#39;{e}{x}{a}{r}{ch}{a}&#39;</span> <span class="s">&#39;{m}{e}{t}{e}{p}{e}&#39;</span> <span class="s">&#39;{a}{p}{o}{k}{l}{e}&#39;</span> <span class="s">&#39;{a}{p}{e}{k}{l}{e}&#39;</span>
+          <span class="s">&#39;{e}{k}{l}{e}&#39;</span> <span class="s">&#39;{p}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps5</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{s}{t}{o}{s}&#39;</span> <span class="s">&#39;{y}{s}{t}{o}{u}&#39;</span> <span class="s">&#39;{y}{s}{t}{o}&#39;</span> <span class="s">&#39;{y}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{s}{t}{o}{y}&#39;</span> <span class="s">&#39;{y}{s}{t}{oo}{n}&#39;</span> <span class="s">&#39;{y}{s}{t}{o}{u}{s}&#39;</span> <span class="s">&#39;{y}{s}{t}{i}&#39;</span> <span class="s">&#39;{y}{s}{t}{i}{s}&#39;</span>
+      <span class="s">&#39;{y}{s}{t}{a}&#39;</span> <span class="s">&#39;{y}{s}{t}{e}{s}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{d}{a}{n}{e}&#39;</span> <span class="s">&#39;{s}{u}{n}{a}{th}{r}{o}&#39;</span> <span class="s">&#39;{k}{l}{e}&#39;</span> <span class="s">&#39;{s}{e}&#39;</span> <span class="s">&#39;{e}{s}{oo}{k}{l}{e}&#39;</span> <span class="s">&#39;{a}{s}{e}&#39;</span> <span class="s">&#39;{p}{l}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{a}{p}&#39;</span> <span class="s">&#39;{a}{r}&#39;</span> <span class="s">&#39;{i}{d}&#39;</span> <span class="s">&#39;{k}{t}&#39;</span> <span class="s">&#39;{s}{k}&#39;</span> <span class="s">&#39;{s}{ch}&#39;</span> <span class="s">&#39;{u}{ps}&#39;</span> <span class="s">&#39;{f}{a}&#39;</span> <span class="s">&#39;{ch}{r}&#39;</span> <span class="s">&#39;{ch}{t}&#39;</span> <span class="s">&#39;{a}{k}{t}&#39;</span>
+          <span class="s">&#39;{a}{o}{r}&#39;</span> <span class="s">&#39;{a}{s}{ch}&#39;</span> <span class="s">&#39;{a}{t}{a}&#39;</span> <span class="s">&#39;{a}{ch}{n}&#39;</span> <span class="s">&#39;{a}{ch}{t}&#39;</span> <span class="s">&#39;{g}{e}{m}&#39;</span> <span class="s">&#39;{g}{u}{r}&#39;</span> <span class="s">&#39;{e}{m}{p}&#39;</span> <span class="s">&#39;{e}{u}{p}&#39;</span> <span class="s">&#39;{e}{ch}{th}&#39;</span> <span class="s">&#39;{i}{f}{a}&#39;</span>
+          <span class="s">&#39;{k}{a}{th}&#39;</span> <span class="s">&#39;{k}{a}{k}&#39;</span> <span class="s">&#39;{k}{u}{l}&#39;</span> <span class="s">&#39;{l}{u}{g}&#39;</span> <span class="s">&#39;{m}{a}{k}&#39;</span> <span class="s">&#39;{m}{e}{g}&#39;</span> <span class="s">&#39;{t}{a}{ch}&#39;</span> <span class="s">&#39;{f}{y}{l}&#39;</span> <span class="s">&#39;{ch}{oo}{r}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{s}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps6</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{s}{m}{o}&#39;</span> <span class="s">&#39;{y}{s}{m}{o}{y}&#39;</span> <span class="s">&#39;{y}{s}{m}{o}{s}&#39;</span> <span class="s">&#39;{y}{s}{m}{o}{u}&#39;</span> <span class="s">&#39;{y}{s}{m}{o}{u}{s}&#39;</span> <span class="s">&#39;{y}{s}{m}{oo}{n}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{s}{e}&#39;</span> <span class="s">&#39;{m}{e}{t}{a}{s}{e}&#39;</span> <span class="s">&#39;{m}{y}{k}{r}{o}{s}{e}&#39;</span> <span class="s">&#39;{e}{g}{k}{l}{e}&#39;</span> <span class="s">&#39;{a}{p}{o}{k}{l}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{s}{m}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{d}{a}{n}{e}&#39;</span> <span class="s">&#39;{a}{n}{t}{y}{d}{a}{n}{e}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{g}{n}{oo}{s}{t}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}{g}{n}{oo}{s}{t}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{a}{t}{o}{m}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}{t}{o}{m}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{g}{n}{oo}{s}{t}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{g}{n}{oo}{s}{t}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{e}{th}{n}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{e}{th}{n}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{e}{k}{l}{e}{k}{t}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{e}{k}{l}{e}{k}{t}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{s}{k}{e}{p}{t}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{s}{k}{e}{p}{t}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{t}{o}{p}{y}{k}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{t}{o}{p}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{a}{l}{e}{x}{a}{n}{d}{r}{y}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{a}{l}{e}{x}{a}{n}{d}{r}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{v}{u}{z}{a}{n}{t}{y}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{v}{u}{z}{a}{n}{t}&#39;</span><span class="p">)</span>
+          <span class="s">&#39;{th}{e}{a}{t}{r}{y}{n}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{th}{e}{a}{t}{r}&#39;</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps7</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{r}{a}{k}{y}&#39;</span> <span class="s">&#39;{a}{r}{a}{k}{y}{a}&#39;</span> <span class="s">&#39;{o}{u}{d}{a}{k}{y}&#39;</span> <span class="s">&#39;{o}{u}{d}{a}{k}{y}{a}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+         <span class="s">&#39;{s}&#39;</span> <span class="s">&#39;{ch}&#39;</span>
+         <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{r}{a}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps8</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{k}{y}&#39;</span> <span class="s">&#39;{a}{k}{y}{a}&#39;</span> <span class="s">&#39;{y}{t}{s}{a}&#39;</span> <span class="s">&#39;{y}{t}{s}{a}{s}&#39;</span> <span class="s">&#39;{y}{t}{s}{e}{s}&#39;</span> <span class="s">&#39;{y}{t}{s}{oo}{n}&#39;</span> <span class="s">&#39;{a}{r}{a}{k}{y}&#39;</span> <span class="s">&#39;{a}{r}{a}{k}{y}{a}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{v}{a}{m}{v}&#39;</span> <span class="s">&#39;{v}{r}&#39;</span> <span class="s">&#39;{k}{a}{y}{m}&#39;</span> <span class="s">&#39;{k}{o}{n}&#39;</span> <span class="s">&#39;{k}{o}{r}&#39;</span> <span class="s">&#39;{l}{a}{v}{r}&#39;</span> <span class="s">&#39;{l}{o}{u}{l}&#39;</span> <span class="s">&#39;{m}{e}{r}&#39;</span> <span class="s">&#39;{m}{o}{u}{s}{t}&#39;</span>
+          <span class="s">&#39;{n}{a}{g}{k}{a}{s}&#39;</span> <span class="s">&#39;{p}{l}&#39;</span> <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{r}{u}&#39;</span> <span class="s">&#39;{s}&#39;</span> <span class="s">&#39;{s}{k}&#39;</span> <span class="s">&#39;{s}{o}{k}&#39;</span> <span class="s">&#39;{s}{p}{a}{n}&#39;</span> <span class="s">&#39;{t}{z}&#39;</span> <span class="s">&#39;{f}{a}{r}{m}&#39;</span> <span class="s">&#39;{ch}&#39;</span> <span class="s">&#39;{k}{a}{p}{a}{k}&#39;</span>
+          <span class="s">&#39;{a}{l}{y}{s}{f}&#39;</span> <span class="s">&#39;{a}{m}{v}{r}&#39;</span> <span class="s">&#39;{a}{n}{th}{r}&#39;</span> <span class="s">&#39;{k}&#39;</span> <span class="s">&#39;{f}{u}{l}&#39;</span> <span class="s">&#39;{k}{a}{t}{r}{a}{p}&#39;</span> <span class="s">&#39;{k}{l}{y}{m}&#39;</span> <span class="s">&#39;{m}{a}{l}&#39;</span> <span class="s">&#39;{s}{l}{o}{v}&#39;</span> <span class="s">&#39;{f}&#39;</span>
+          <span class="s">&#39;{s}{f}&#39;</span> <span class="s">&#39;{t}{s}{e}{ch}{o}{s}{l}{o}{v}&#39;</span>
+           <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{v}&#39;</span> <span class="s">&#39;{v}{a}{l}&#39;</span> <span class="s">&#39;{g}{y}{a}{n}&#39;</span> <span class="s">&#39;{g}{l}&#39;</span> <span class="s">&#39;{z}&#39;</span> <span class="s">&#39;{i}{g}{o}{u}{m}{e}{n}&#39;</span> <span class="s">&#39;{k}{a}{r}{d}&#39;</span> <span class="s">&#39;{k}{o}{n}&#39;</span> <span class="s">&#39;{m}{a}{k}{r}{u}{n}&#39;</span> <span class="s">&#39;{n}{u}{f}&#39;</span>
+          <span class="s">&#39;{p}{a}{t}{e}{r}&#39;</span> <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{s}{k}&#39;</span> <span class="s">&#39;{t}{o}{s}&#39;</span> <span class="s">&#39;{t}{r}{y}{p}{o}{l}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{t}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="s">&#39;{k}{o}{r}&#39;</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{t}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps9</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{d}{y}{o}&#39;</span> <span class="s">&#39;{y}{d}{y}{a}&#39;</span> <span class="s">&#39;{y}{d}{y}{oo}{n}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{a}{y}{f}{n}&#39;</span> <span class="s">&#39;{y}{r}&#39;</span> <span class="s">&#39;{o}{l}{o}&#39;</span> <span class="s">&#39;{ps}{a}{l}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{d}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{e}&#39;</span> <span class="s">&#39;{p}{a}{y}{ch}{n}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{d}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">steps10</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{s}{k}{o}{s}&#39;</span> <span class="s">&#39;{y}{s}{k}{o}{u}&#39;</span> <span class="s">&#39;{y}{s}{k}{o}&#39;</span> <span class="s">&#39;{y}{s}{k}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+         <span class="s">&#39;{d}&#39;</span> <span class="s">&#39;{y}{v}&#39;</span> <span class="s">&#39;{m}{i}{n}&#39;</span> <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{f}{r}{a}{g}{k}&#39;</span> <span class="s">&#39;{l}{u}{k}&#39;</span> <span class="s">&#39;{o}{v}{e}{l}&#39;</span>
+         <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{s}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step2a</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{d}{e}{s}&#39;</span> <span class="s">&#39;{a}{d}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="ow">not</span> <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{k}&#39;</span> <span class="s">&#39;{m}{a}{m}&#39;</span> <span class="s">&#39;{m}{a}{n}&#39;</span> <span class="s">&#39;{m}{p}{a}{m}{p}&#39;</span> <span class="s">&#39;{p}{a}{t}{e}{r}&#39;</span> <span class="s">&#39;{g}{y}{a}{g}{y}&#39;</span> <span class="s">&#39;{n}{t}{a}{n}{t}&#39;</span> <span class="s">&#39;{k}{u}{r}&#39;</span> <span class="s">&#39;{th}{e}{y}&#39;</span> <span class="s">&#39;{p}{e}{th}{e}{r}&#39;</span>
+    <span class="p">))</span>
+    <span class="ow">insert</span> <span class="s">&#39;{a}{d}&#39;</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step2b</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{e}{d}{e}{s}&#39;</span> <span class="s">&#39;{e}{d}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{p}&#39;</span> <span class="s">&#39;{y}{p}&#39;</span> <span class="s">&#39;{e}{m}{p}&#39;</span> <span class="s">&#39;{u}{p}&#39;</span> <span class="s">&#39;{g}{i}{p}&#39;</span> <span class="s">&#39;{d}{a}{p}&#39;</span> <span class="s">&#39;{k}{r}{a}{s}{p}&#39;</span> <span class="s">&#39;{m}{y}{l}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}{d}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step2c</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{u}{d}{e}{s}&#39;</span> <span class="s">&#39;{o}{u}{d}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{r}{k}&#39;</span> <span class="s">&#39;{k}{a}{l}{y}{a}{k}&#39;</span> <span class="s">&#39;{p}{e}{t}{a}{l}&#39;</span> <span class="s">&#39;{l}{y}{ch}&#39;</span> <span class="s">&#39;{p}{l}{e}{x}&#39;</span> <span class="s">&#39;{s}{k}&#39;</span> <span class="s">&#39;{s}&#39;</span> <span class="s">&#39;{f}{l}&#39;</span> <span class="s">&#39;{f}{r}&#39;</span> <span class="s">&#39;{v}{e}{l}&#39;</span> <span class="s">&#39;{l}{o}{u}{l}&#39;</span> <span class="s">&#39;{ch}{n}&#39;</span>
+      <span class="s">&#39;{s}{p}&#39;</span> <span class="s">&#39;{t}{r}{a}{g}&#39;</span> <span class="s">&#39;{f}{e}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{u}{d}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step2d</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{e}{oo}{s}&#39;</span> <span class="s">&#39;{e}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{th}&#39;</span> <span class="s">&#39;{d}&#39;</span> <span class="s">&#39;{e}{l}&#39;</span> <span class="s">&#39;{g}{a}{l}&#39;</span> <span class="s">&#39;{n}&#39;</span> <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{y}{d}&#39;</span> <span class="s">&#39;{p}{a}{r}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step3</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{y}{a}&#39;</span> <span class="s">&#39;{y}{o}{u}&#39;</span> <span class="s">&#39;{y}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">([</span><span class="n">v</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step4</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+       <span class="s">&#39;{y}{k}{a}&#39;</span> <span class="s">&#39;{y}{k}{o}&#39;</span> <span class="s">&#39;{y}{k}{o}{u}&#39;</span> <span class="s">&#39;{y}{k}{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">([</span><span class="n">v</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span> <span class="ow">or</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{l}&#39;</span> <span class="s">&#39;{a}{d}&#39;</span> <span class="s">&#39;{e}{n}{d}&#39;</span> <span class="s">&#39;{a}{m}{a}{n}&#39;</span> <span class="s">&#39;{a}{m}{m}{o}{ch}{a}{l}&#39;</span> <span class="s">&#39;{i}{th}&#39;</span> <span class="s">&#39;{a}{n}{i}{th}&#39;</span> <span class="s">&#39;{a}{n}{t}{y}{d}&#39;</span> <span class="s">&#39;{f}{u}{s}&#39;</span> <span class="s">&#39;{v}{r}{oo}{m}&#39;</span> <span class="s">&#39;{g}{e}{r}&#39;</span>
+      <span class="s">&#39;{e}{x}{oo}{d}&#39;</span> <span class="s">&#39;{k}{a}{l}{p}&#39;</span> <span class="s">&#39;{k}{a}{l}{l}{y}{n}&#39;</span> <span class="s">&#39;{k}{a}{t}{a}{d}&#39;</span> <span class="s">&#39;{m}{o}{u}{l}&#39;</span> <span class="s">&#39;{m}{p}{a}{n}&#39;</span> <span class="s">&#39;{m}{p}{a}{g}{y}{a}{t}&#39;</span> <span class="s">&#39;{m}{p}{o}{l}&#39;</span> <span class="s">&#39;{m}{p}{o}{s}&#39;</span>
+      <span class="s">&#39;{n}{y}{t}&#39;</span> <span class="s">&#39;{x}{y}{k}&#39;</span> <span class="s">&#39;{s}{u}{n}{o}{m}{i}{l}&#39;</span> <span class="s">&#39;{p}{e}{t}{s}&#39;</span> <span class="s">&#39;{p}{y}{t}{s}&#39;</span> <span class="s">&#39;{p}{y}{k}{a}{n}{t}&#39;</span> <span class="s">&#39;{p}{l}{y}{a}{t}{s}&#39;</span> <span class="s">&#39;{p}{o}{s}{t}{e}{l}{n}&#39;</span> <span class="s">&#39;{p}{r}{oo}{t}{o}{d}&#39;</span>
+      <span class="s">&#39;{s}{e}{r}{t}&#39;</span> <span class="s">&#39;{s}{u}{n}{a}{d}&#39;</span> <span class="s">&#39;{t}{s}{a}{m}&#39;</span> <span class="s">&#39;{u}{p}{o}{d}&#39;</span> <span class="s">&#39;{f}{y}{l}{o}{n}&#39;</span> <span class="s">&#39;{f}{u}{l}{o}{d}&#39;</span> <span class="s">&#39;{ch}{a}{s}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5a</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span><span class="s">&#39;{a}{g}{a}{m}{e}&#39;</span> <span class="ow">atlimit</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{g}{a}{m}&#39;</span><span class="p">)</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{a}{g}{a}{m}{e}&#39;</span> <span class="s">&#39;{i}{s}{a}{m}{e}&#39;</span> <span class="s">&#39;{o}{u}{s}{a}{m}{e}&#39;</span> <span class="s">&#39;{i}{k}{a}{m}{e}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{a}{m}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="s">&#39;{a}{m}{e}&#39;</span><span class="p">]</span>
+    <span class="ow">delete</span>
+    <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{n}{a}{p}&#39;</span> <span class="s">&#39;{a}{p}{o}{th}&#39;</span> <span class="s">&#39;{a}{p}{o}{k}&#39;</span> <span class="s">&#39;{a}{p}{o}{s}{t}&#39;</span> <span class="s">&#39;{v}{o}{u}{v}&#39;</span> <span class="s">&#39;{x}{e}{th}&#39;</span> <span class="s">&#39;{o}{u}{l}&#39;</span> <span class="s">&#39;{p}{e}{th}&#39;</span> <span class="s">&#39;{p}{y}{k}{r}&#39;</span> <span class="s">&#39;{p}{o}{t}&#39;</span> <span class="s">&#39;{s}{y}{ch}&#39;</span> <span class="s">&#39;{ch}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{m}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5b</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{a}{g}{a}{n}{e}&#39;</span> <span class="s">&#39;{i}{s}{a}{n}{e}&#39;</span> <span class="s">&#39;{o}{u}{s}{a}{n}{e}&#39;</span> <span class="s">&#39;{y}{o}{n}{t}{a}{n}{e}&#39;</span> <span class="s">&#39;{y}{o}{t}{a}{n}{e}&#39;</span> <span class="s">&#39;{y}{o}{u}{n}{t}{a}{n}{e}&#39;</span> <span class="s">&#39;{o}{n}{t}{a}{n}{e}&#39;</span> <span class="s">&#39;{o}{t}{a}{n}{e}&#39;</span>
+        <span class="s">&#39;{o}{u}{n}{t}{a}{n}{e}&#39;</span> <span class="s">&#39;{i}{k}{a}{n}{e}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{a}{n}{e}&#39;</span> <span class="p">(</span>
+          <span class="ow">delete</span>
+          <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+          <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+            <span class="s">&#39;{t}{r}&#39;</span> <span class="s">&#39;{t}{s}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{g}{a}{n}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+          <span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="s">&#39;{a}{n}{e}&#39;</span><span class="p">]</span>
+    <span class="ow">delete</span>
+    <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+    <span class="p">([</span><span class="n">v2</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{n}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span> <span class="ow">or</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{v}{e}{t}{e}{r}&#39;</span> <span class="s">&#39;{v}{o}{u}{l}{k}&#39;</span> <span class="s">&#39;{v}{r}{a}{ch}{m}&#39;</span> <span class="s">&#39;{g}&#39;</span> <span class="s">&#39;{d}{r}{a}{d}{o}{u}{m}&#39;</span>
+      <span class="s">&#39;{th}&#39;</span> <span class="s">&#39;{k}{a}{l}{p}{o}{u}{z}&#39;</span> <span class="s">&#39;{k}{a}{s}{t}{e}{l}&#39;</span> <span class="s">&#39;{k}{o}{r}{m}{o}{r}&#39;</span> <span class="s">&#39;{l}{a}{o}{p}{l}&#39;</span> <span class="s">&#39;{m}{oo}{a}{m}{e}{th}&#39;</span>
+      <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{m}{o}{u}{s}{o}{u}{l}{m}&#39;</span> <span class="s">&#39;{n}&#39;</span> <span class="s">&#39;{o}{u}{l}&#39;</span> <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{p}{e}{l}{e}{k}&#39;</span> <span class="s">&#39;{p}{l}&#39;</span> <span class="s">&#39;{p}{o}{l}{y}{s}&#39;</span>
+      <span class="s">&#39;{p}{o}{r}{t}{o}{l}&#39;</span> <span class="s">&#39;{s}{a}{r}{a}{k}{a}{t}{s}&#39;</span> <span class="s">&#39;{s}{o}{u}{l}{t}&#39;</span> <span class="s">&#39;{t}{s}{a}{r}{l}{a}{t}&#39;</span> <span class="s">&#39;{o}{r}{f}&#39;</span>
+      <span class="s">&#39;{t}{s}{y}{g}{g}&#39;</span> <span class="s">&#39;{t}{s}{o}{p}&#39;</span> <span class="s">&#39;{f}{oo}{t}{o}{s}{t}{e}{f}&#39;</span> <span class="s">&#39;{ch}&#39;</span> <span class="s">&#39;{ps}{u}{ch}{o}{p}{l}&#39;</span> <span class="s">&#39;{a}{g}&#39;</span>
+      <span class="s">&#39;{g}{a}{l}&#39;</span> <span class="s">&#39;{g}{e}{r}&#39;</span> <span class="s">&#39;{d}{e}{k}&#39;</span> <span class="s">&#39;{d}{y}{p}{l}&#39;</span> <span class="s">&#39;{a}{m}{e}{r}{y}{k}{a}{n}&#39;</span> <span class="s">&#39;{o}{u}{r}&#39;</span> <span class="s">&#39;{p}{y}{th}&#39;</span>
+      <span class="s">&#39;{p}{o}{u}{r}{y}{t}&#39;</span> <span class="s">&#39;{s}&#39;</span> <span class="s">&#39;{z}{oo}{n}{t}&#39;</span> <span class="s">&#39;{y}{k}&#39;</span> <span class="s">&#39;{k}{a}{s}{t}&#39;</span> <span class="s">&#39;{k}{o}{p}&#39;</span> <span class="s">&#39;{l}{y}{ch}&#39;</span>
+      <span class="s">&#39;{l}{o}{u}{th}{i}{r}&#39;</span> <span class="s">&#39;{m}{a}{y}{n}{t}&#39;</span> <span class="s">&#39;{m}{e}{l}&#39;</span> <span class="s">&#39;{s}{y}{g}&#39;</span> <span class="s">&#39;{s}{p}&#39;</span> <span class="s">&#39;{s}{t}{e}{g}&#39;</span> <span class="s">&#39;{t}{r}{a}{g}&#39;</span>
+      <span class="s">&#39;{t}{s}{a}{g}&#39;</span> <span class="s">&#39;{f}&#39;</span> <span class="s">&#39;{e}{r}&#39;</span> <span class="s">&#39;{a}{d}{a}{p}&#39;</span> <span class="s">&#39;{a}{th}{y}{g}{g}&#39;</span> <span class="s">&#39;{a}{m}{i}{ch}&#39;</span> <span class="s">&#39;{a}{n}{y}{k}&#39;</span>
+      <span class="s">&#39;{a}{n}{o}{r}{g}&#39;</span> <span class="s">&#39;{a}{p}{i}{g}&#39;</span> <span class="s">&#39;{a}{p}{y}{th}&#39;</span> <span class="s">&#39;{a}{t}{s}{y}{g}{g}&#39;</span> <span class="s">&#39;{v}{a}{s}&#39;</span> <span class="s">&#39;{v}{a}{s}{k}&#39;</span>
+      <span class="s">&#39;{v}{a}{th}{u}{g}{a}{l}&#39;</span> <span class="s">&#39;{v}{y}{o}{m}{i}{ch}&#39;</span> <span class="s">&#39;{v}{r}{a}{ch}{u}{k}&#39;</span> <span class="s">&#39;{d}{y}{a}{t}&#39;</span> <span class="s">&#39;{d}{y}{a}{f}&#39;</span> <span class="s">&#39;{e}{n}{o}{r}{g}&#39;</span>
+      <span class="s">&#39;{th}{u}{s}&#39;</span> <span class="s">&#39;{k}{a}{p}{n}{o}{v}{y}{o}{m}{i}{ch}&#39;</span> <span class="s">&#39;{k}{a}{t}{a}{g}{a}{l}&#39;</span> <span class="s">&#39;{k}{l}{y}{v}&#39;</span> <span class="s">&#39;{k}{o}{y}{l}{a}{r}{f}&#39;</span>
+      <span class="s">&#39;{l}{y}{v}&#39;</span> <span class="s">&#39;{m}{e}{g}{l}{o}{v}{y}{o}{m}{i}{ch}&#39;</span> <span class="s">&#39;{m}{y}{k}{r}{o}{v}{y}{o}{m}{i}{ch}&#39;</span> <span class="s">&#39;{n}{t}{a}{v}&#39;</span>
+      <span class="s">&#39;{x}{i}{r}{o}{k}{l}{y}{v}&#39;</span> <span class="s">&#39;{o}{l}{y}{g}{o}{d}{a}{m}&#39;</span> <span class="s">&#39;{o}{l}{o}{g}{a}{l}&#39;</span> <span class="s">&#39;{p}{e}{n}{t}{a}{r}{f}&#39;</span> <span class="s">&#39;{p}{e}{r}{i}{f}&#39;</span>
+      <span class="s">&#39;{p}{e}{r}{y}{t}{r}&#39;</span> <span class="s">&#39;{p}{l}{a}{t}&#39;</span> <span class="s">&#39;{p}{o}{l}{u}{d}{a}{p}&#39;</span> <span class="s">&#39;{p}{o}{l}{u}{m}{i}{ch}&#39;</span> <span class="s">&#39;{s}{t}{e}{f}&#39;</span> <span class="s">&#39;{t}{a}{v}&#39;</span>
+      <span class="s">&#39;{t}{e}{t}&#39;</span> <span class="s">&#39;{u}{p}{e}{r}{i}{f}&#39;</span> <span class="s">&#39;{u}{p}{o}{k}{o}{p}&#39;</span> <span class="s">&#39;{ch}{a}{m}{i}{l}{o}{d}{a}{p}&#39;</span> <span class="s">&#39;{ps}{i}{l}{o}{t}{a}{v}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{n}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5c</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{i}{s}{e}{t}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="s">&#39;{e}{t}{e}&#39;</span><span class="p">]</span>
+    <span class="ow">delete</span>
+    <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+    <span class="p">([</span><span class="n">v2</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span> <span class="ow">or</span>
+    <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{d}&#39;</span> <span class="s">&#39;{a}{y}{r}&#39;</span> <span class="s">&#39;{f}{o}{r}&#39;</span> <span class="s">&#39;{t}{a}{th}&#39;</span> <span class="s">&#39;{d}{y}{a}{th}&#39;</span> <span class="s">&#39;{s}{ch}&#39;</span> <span class="s">&#39;{e}{n}{d}&#39;</span> <span class="s">&#39;{e}{u}{r}&#39;</span> <span class="s">&#39;{t}{y}{th}&#39;</span> <span class="s">&#39;{u}{p}{e}{r}{th}&#39;</span>
+      <span class="s">&#39;{r}{a}{th}&#39;</span> <span class="s">&#39;{e}{n}{th}&#39;</span> <span class="s">&#39;{r}{o}{th}&#39;</span> <span class="s">&#39;{s}{th}&#39;</span> <span class="s">&#39;{p}{u}{r}&#39;</span> <span class="s">&#39;{a}{y}{n}&#39;</span> <span class="s">&#39;{s}{u}{n}{d}&#39;</span> <span class="s">&#39;{s}{u}{n}&#39;</span> <span class="s">&#39;{s}{u}{n}{th}&#39;</span> <span class="s">&#39;{ch}{oo}{r}&#39;</span>
+      <span class="s">&#39;{p}{o}{n}&#39;</span> <span class="s">&#39;{v}{r}&#39;</span> <span class="s">&#39;{k}{a}{th}&#39;</span> <span class="s">&#39;{e}{u}{th}&#39;</span> <span class="s">&#39;{e}{k}{th}&#39;</span> <span class="s">&#39;{n}{e}{t}&#39;</span> <span class="s">&#39;{r}{o}{n}&#39;</span> <span class="s">&#39;{a}{r}{k}&#39;</span> <span class="s">&#39;{v}{a}{r}&#39;</span> <span class="s">&#39;{v}{o}{l}&#39;</span> <span class="s">&#39;{oo}{f}{e}{l}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">))</span> <span class="ow">or</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{v}{a}{r}&#39;</span> <span class="s">&#39;{v}{e}{n}&#39;</span> <span class="s">&#39;{e}{n}{a}{r}&#39;</span> <span class="s">&#39;{a}{v}{r}&#39;</span> <span class="s">&#39;{a}{d}&#39;</span> <span class="s">&#39;{a}{th}&#39;</span> <span class="s">&#39;{a}{n}&#39;</span> <span class="s">&#39;{a}{p}{l}&#39;</span> <span class="s">&#39;{v}{a}{r}{o}{n}&#39;</span> <span class="s">&#39;{n}{t}{r}&#39;</span> <span class="s">&#39;{s}{k}&#39;</span> <span class="s">&#39;{k}{o}{p}&#39;</span>
+      <span class="s">&#39;{m}{p}{o}{r}&#39;</span> <span class="s">&#39;{n}{y}{f}&#39;</span> <span class="s">&#39;{p}{a}{g}&#39;</span> <span class="s">&#39;{p}{a}{r}{a}{k}{a}{l}&#39;</span> <span class="s">&#39;{s}{e}{r}{p}&#39;</span> <span class="s">&#39;{s}{k}{e}{l}&#39;</span> <span class="s">&#39;{s}{u}{r}{f}&#39;</span> <span class="s">&#39;{t}{o}{k}&#39;</span> <span class="s">&#39;{u}&#39;</span> <span class="s">&#39;{d}&#39;</span> <span class="s">&#39;{e}{m}&#39;</span>
+      <span class="s">&#39;{th}{a}{r}{r}&#39;</span> <span class="s">&#39;{th}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{e}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5d</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{n}{t}{a}{s}&#39;</span> <span class="s">&#39;{oo}{n}{t}{a}{s}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="s">&#39;{a}{r}{ch}&#39;</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{n}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="s">&#39;{k}{r}{e}&#39;</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{oo}{n}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5e</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{m}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{o}{m}{a}{s}{t}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="s">&#39;{o}{n}&#39;</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{m}{a}{s}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5f</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="s">&#39;{y}{e}{s}{t}{e}&#39;</span><span class="p">]</span>
+      <span class="ow">delete</span>
+      <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{a}{p}&#39;</span> <span class="s">&#39;{s}{u}{m}{p}&#39;</span> <span class="s">&#39;{a}{s}{u}{m}{p}&#39;</span> <span class="s">&#39;{a}{k}{a}{t}{a}{p}&#39;</span> <span class="s">&#39;{a}{m}{e}{t}{a}{m}{f}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{e}{s}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="s">&#39;{e}{s}{t}{e}&#39;</span><span class="p">]</span>
+    <span class="ow">delete</span>
+    <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{l}&#39;</span> <span class="s">&#39;{a}{r}&#39;</span> <span class="s">&#39;{e}{k}{t}{e}{l}&#39;</span> <span class="s">&#39;{z}&#39;</span> <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{x}&#39;</span> <span class="s">&#39;{p}{a}{r}{a}{k}{a}{l}&#39;</span> <span class="s">&#39;{p}{r}{o}&#39;</span> <span class="s">&#39;{n}{y}{s}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{y}{e}{s}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5g</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{i}{th}{i}{k}{a}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{e}{s}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{i}{k}{a}&#39;</span> <span class="s">&#39;{i}{k}{e}{s}&#39;</span> <span class="s">&#39;{i}{k}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+           <span class="s">&#39;{s}{k}{oo}{l}&#39;</span> <span class="s">&#39;{s}{k}{o}{u}{l}&#39;</span> <span class="s">&#39;{n}{a}{r}{th}&#39;</span> <span class="s">&#39;{s}{f}&#39;</span> <span class="s">&#39;{o}{th}&#39;</span> <span class="s">&#39;{p}{y}{th}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{i}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+           <span class="s">&#39;{d}{y}{a}{th}&#39;</span> <span class="s">&#39;{th}&#39;</span> <span class="s">&#39;{p}{a}{r}{a}{k}{a}{t}{a}{th}&#39;</span> <span class="s">&#39;{p}{r}{o}{s}{th}&#39;</span> <span class="s">&#39;{s}{u}{n}{th}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{i}{k}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5h</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{u}{s}{a}&#39;</span> <span class="s">&#39;{o}{u}{s}{e}{s}&#39;</span> <span class="s">&#39;{o}{u}{s}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{p}{o}{d}{a}{r}&#39;</span> <span class="s">&#39;{v}{l}{e}{p}&#39;</span> <span class="s">&#39;{p}{a}{n}{t}{a}{ch}&#39;</span> <span class="s">&#39;{f}{r}{u}{d}&#39;</span> <span class="s">&#39;{m}{a}{n}{t}{y}{l}&#39;</span> <span class="s">&#39;{m}{a}{l}{l}&#39;</span> <span class="s">&#39;{k}{u}{m}{a}{t}&#39;</span> <span class="s">&#39;{l}{a}{ch}&#39;</span> <span class="s">&#39;{l}{i}{g}&#39;</span>
+          <span class="s">&#39;{f}{a}{g}&#39;</span> <span class="s">&#39;{o}{m}&#39;</span> <span class="s">&#39;{p}{r}{oo}{t}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{u}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+
+        <span class="p">))</span> <span class="ow">or</span>
+        <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+          <span class="s">&#39;{f}{a}{r}{m}{a}{k}&#39;</span> <span class="s">&#39;{ch}{a}{d}&#39;</span> <span class="s">&#39;{a}{g}{k}&#39;</span> <span class="s">&#39;{a}{n}{a}{r}{r}&#39;</span> <span class="s">&#39;{v}{r}{o}{m}&#39;</span> <span class="s">&#39;{e}{k}{l}{y}{p}&#39;</span> <span class="s">&#39;{l}{a}{m}{p}{y}{d}&#39;</span> <span class="s">&#39;{l}{e}{ch}&#39;</span> <span class="s">&#39;{m}&#39;</span> <span class="s">&#39;{p}{a}{t}&#39;</span>
+          <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{l}&#39;</span> <span class="s">&#39;{m}{e}{d}&#39;</span> <span class="s">&#39;{m}{e}{s}{a}{z}&#39;</span> <span class="s">&#39;{u}{p}{o}{t}{e}{y}{n}&#39;</span> <span class="s">&#39;{a}{m}&#39;</span> <span class="s">&#39;{a}{y}{th}&#39;</span> <span class="s">&#39;{a}{n}{i}{k}&#39;</span> <span class="s">&#39;{d}{e}{s}{p}{o}{z}&#39;</span>
+          <span class="s">&#39;{e}{n}{d}{y}{a}{f}{e}{r}&#39;</span> <span class="s">&#39;{d}{e}&#39;</span> <span class="s">&#39;{d}{e}{u}{t}{e}{r}{e}{u}&#39;</span> <span class="s">&#39;{k}{a}{th}{a}{r}{e}{u}&#39;</span> <span class="s">&#39;{p}{l}{e}&#39;</span> <span class="s">&#39;{t}{s}{a}&#39;</span>
+          <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{u}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+        <span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5i</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{g}{a}&#39;</span> <span class="s">&#39;{a}{g}{e}{s}&#39;</span> <span class="s">&#39;{a}{g}{e}&#39;</span> <span class="p">(</span>
+        <span class="ow">delete</span>
+        <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span>
+        <span class="p">([</span><span class="s">&#39;{k}{o}{l}{l}&#39;</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{g}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+          <span class="ow">not</span> <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span><span class="s">&#39;{ps}{o}{f}&#39;</span> <span class="s">&#39;{n}{a}{u}{l}{o}{ch}&#39;</span><span class="p">))</span>
+          <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+            <span class="s">&#39;{o}{f}&#39;</span> <span class="s">&#39;{p}{e}{l}&#39;</span> <span class="s">&#39;{ch}{o}{r}{t}&#39;</span> <span class="s">&#39;{l}{l}&#39;</span> <span class="s">&#39;{s}{f}&#39;</span> <span class="s">&#39;{r}{p}&#39;</span> <span class="s">&#39;{f}{r}&#39;</span> <span class="s">&#39;{p}{r}&#39;</span> <span class="s">&#39;{l}{o}{ch}&#39;</span> <span class="s">&#39;{s}{m}{i}{n}&#39;</span>
+            <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{g}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+          <span class="p">))</span> <span class="ow">or</span>
+          <span class="p">([</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+            <span class="s">&#39;{a}{v}{a}{s}{t}&#39;</span> <span class="s">&#39;{p}{o}{l}{u}{f}&#39;</span> <span class="s">&#39;{a}{d}{i}{f}&#39;</span> <span class="s">&#39;{p}{a}{m}{f}&#39;</span> <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{a}{s}{p}&#39;</span> <span class="s">&#39;{a}{f}&#39;</span> <span class="s">&#39;{a}{m}{a}{l}&#39;</span> <span class="s">&#39;{a}{m}{a}{l}{l}{y}&#39;</span>
+            <span class="s">&#39;{a}{n}{u}{s}{t}&#39;</span> <span class="s">&#39;{a}{p}{e}{r}&#39;</span> <span class="s">&#39;{a}{s}{p}{a}{r}&#39;</span> <span class="s">&#39;{a}{ch}{a}{r}&#39;</span> <span class="s">&#39;{d}{e}{r}{v}{e}{n}&#39;</span> <span class="s">&#39;{d}{r}{o}{s}{o}{p}&#39;</span> <span class="s">&#39;{x}{e}{f}&#39;</span> <span class="s">&#39;{n}{e}{o}{p}&#39;</span>
+            <span class="s">&#39;{n}{o}{m}{o}{t}&#39;</span> <span class="s">&#39;{o}{l}{o}{p}&#39;</span> <span class="s">&#39;{o}{m}{o}{t}&#39;</span> <span class="s">&#39;{p}{r}{o}{s}{t}&#39;</span> <span class="s">&#39;{p}{r}{o}{s}{oo}{p}{o}{p}&#39;</span> <span class="s">&#39;{s}{u}{m}{p}&#39;</span> <span class="s">&#39;{s}{u}{n}{t}&#39;</span> <span class="s">&#39;{t}&#39;</span> <span class="s">&#39;{u}{p}{o}{t}&#39;</span>
+            <span class="s">&#39;{ch}{a}{r}&#39;</span> <span class="s">&#39;{a}{e}{y}{p}&#39;</span> <span class="s">&#39;{a}{y}{m}{o}{s}{t}&#39;</span> <span class="s">&#39;{a}{n}{u}{p}&#39;</span> <span class="s">&#39;{a}{p}{o}{t}&#39;</span> <span class="s">&#39;{a}{r}{t}{y}{p}&#39;</span> <span class="s">&#39;{d}{y}{a}{t}&#39;</span> <span class="s">&#39;{e}{n}&#39;</span> <span class="s">&#39;{e}{p}{y}{t}&#39;</span>
+            <span class="s">&#39;{k}{r}{o}{k}{a}{l}{o}{p}&#39;</span> <span class="s">&#39;{s}{y}{d}{i}{r}{o}{p}&#39;</span> <span class="s">&#39;{l}&#39;</span> <span class="s">&#39;{n}{a}{u}&#39;</span> <span class="s">&#39;{o}{u}{l}{a}{m}&#39;</span> <span class="s">&#39;{o}{u}{r}&#39;</span> <span class="s">&#39;{p}&#39;</span> <span class="s">&#39;{t}{r}&#39;</span> <span class="s">&#39;{m}&#39;</span>
+            <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{a}{g}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+          <span class="p">))</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5j</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{i}{s}{e}&#39;</span> <span class="s">&#39;{i}{s}{o}{u}&#39;</span> <span class="s">&#39;{i}{s}{a}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{n}&#39;</span> <span class="s">&#39;{ch}{e}{r}{s}{o}{n}&#39;</span> <span class="s">&#39;{d}{oo}{d}{e}{k}{a}{n}&#39;</span> <span class="s">&#39;{e}{r}{i}{m}{o}{n}&#39;</span> <span class="s">&#39;{m}{e}{g}{a}{l}{o}{n}&#39;</span> <span class="s">&#39;{e}{p}{t}{a}{n}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{i}{s}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5k</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{i}{s}{t}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}{s}{v}&#39;</span> <span class="s">&#39;{s}{v}&#39;</span> <span class="s">&#39;{a}{ch}{r}&#39;</span> <span class="s">&#39;{ch}{r}&#39;</span> <span class="s">&#39;{a}{p}{l}&#39;</span> <span class="s">&#39;{a}{e}{y}{m}{n}&#39;</span> <span class="s">&#39;{d}{u}{s}{ch}{r}&#39;</span> <span class="s">&#39;{e}{u}{ch}{r}&#39;</span> <span class="s">&#39;{k}{o}{y}{n}{o}{ch}{r}&#39;</span> <span class="s">&#39;{p}{a}{l}{y}{m}{ps}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{i}{s}{t}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5l</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{u}{n}{e}&#39;</span> <span class="s">&#39;{i}{s}{o}{u}{n}{e}&#39;</span> <span class="s">&#39;{i}{th}{o}{u}{n}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{n}&#39;</span> <span class="s">&#39;{r}&#39;</span> <span class="s">&#39;{s}{p}{y}&#39;</span> <span class="s">&#39;{s}{t}{r}{a}{v}{o}{m}{o}{u}{t}{s}&#39;</span> <span class="s">&#39;{k}{a}{k}{o}{m}{o}{u}{t}{s}&#39;</span> <span class="s">&#39;{e}{x}{oo}{n}&#39;</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{u}{n}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step5m</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{o}{u}{m}{e}&#39;</span> <span class="s">&#39;{i}{s}{o}{u}{m}{e}&#39;</span> <span class="s">&#39;{i}{th}{o}{u}{m}{e}&#39;</span> <span class="p">(</span><span class="ow">delete</span> <span class="ow">do</span> <span class="ow">unset</span> <span class="n">test1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="ow">atlimit</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{p}{a}{r}{a}{s}{o}{u}{s}&#39;</span> <span class="s">&#39;{f}&#39;</span> <span class="s">&#39;{ch}&#39;</span> <span class="s">&#39;{oo}{r}{y}{o}{p}{l}&#39;</span> <span class="s">&#39;{a}{z}&#39;</span> <span class="s">&#39;{a}{l}{l}{o}{s}{o}{u}{s}&#39;</span> <span class="s">&#39;{a}{s}{o}{u}{s}&#39;</span>
+      <span class="p">(</span><span class="o">-&gt;</span> <span class="n">s</span> <span class="o">&lt;-</span> <span class="s">&#39;{o}{u}{m}&#39;</span> <span class="ow">insert</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step6</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+        <span class="s">&#39;{m}{a}{t}{a}&#39;</span> <span class="s">&#39;{m}{a}{t}{oo}{n}&#39;</span> <span class="s">&#39;{m}{a}{t}{o}{s}&#39;</span> <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{m}{a}&#39;</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">test1</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{a}&#39;</span> <span class="s">&#39;{a}{g}{a}{t}{e}&#39;</span> <span class="s">&#39;{a}{g}{a}{n}&#39;</span> <span class="s">&#39;{a}{e}{y}&#39;</span> <span class="s">&#39;{a}{m}{a}{y}&#39;</span> <span class="s">&#39;{a}{n}&#39;</span> <span class="s">&#39;{a}{s}&#39;</span> <span class="s">&#39;{a}{s}{a}{y}&#39;</span> <span class="s">&#39;{a}{t}{a}{y}&#39;</span> <span class="s">&#39;{a}{oo}&#39;</span> <span class="s">&#39;{e}&#39;</span> <span class="s">&#39;{e}{y}&#39;</span>
+      <span class="s">&#39;{e}{y}{s}&#39;</span> <span class="s">&#39;{e}{y}{t}{e}&#39;</span> <span class="s">&#39;{e}{s}{a}{y}&#39;</span> <span class="s">&#39;{e}{s}&#39;</span> <span class="s">&#39;{e}{t}{a}{y}&#39;</span> <span class="s">&#39;{y}&#39;</span> <span class="s">&#39;{y}{e}{m}{a}{y}&#39;</span> <span class="s">&#39;{y}{e}{m}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{e}{t}{a}{y}&#39;</span> <span class="s">&#39;{y}{e}{s}{a}{y}&#39;</span>
+      <span class="s">&#39;{y}{e}{s}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{o}{m}{a}{s}{t}{a}{n}&#39;</span> <span class="s">&#39;{y}{o}{m}{o}{u}{n}&#39;</span> <span class="s">&#39;{y}{o}{m}{o}{u}{n}{a}&#39;</span> <span class="s">&#39;{y}{o}{n}{t}{a}{n}&#39;</span> <span class="s">&#39;{y}{o}{n}{t}{o}{u}{s}{a}{n}&#39;</span> <span class="s">&#39;{y}{o}{s}{a}{s}{t}{a}{n}&#39;</span>
+      <span class="s">&#39;{y}{o}{s}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{o}{s}{o}{u}{n}&#39;</span> <span class="s">&#39;{y}{o}{s}{o}{u}{n}{a}&#39;</span> <span class="s">&#39;{y}{o}{t}{a}{n}&#39;</span> <span class="s">&#39;{y}{o}{u}{m}{a}&#39;</span> <span class="s">&#39;{y}{o}{u}{m}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{y}{o}{u}{n}{t}{a}{y}&#39;</span>
+      <span class="s">&#39;{y}{o}{u}{n}{t}{a}{n}&#39;</span> <span class="s">&#39;{i}&#39;</span> <span class="s">&#39;{i}{d}{e}{s}&#39;</span> <span class="s">&#39;{i}{d}{oo}{n}&#39;</span> <span class="s">&#39;{i}{th}{e}{y}&#39;</span> <span class="s">&#39;{i}{th}{e}{y}{s}&#39;</span> <span class="s">&#39;{i}{th}{e}{y}{t}{e}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{a}{t}{e}&#39;</span> <span class="s">&#39;{i}{th}{i}{k}{a}{n}&#39;</span>
+      <span class="s">&#39;{i}{th}{o}{u}{n}&#39;</span> <span class="s">&#39;{i}{th}{oo}&#39;</span> <span class="s">&#39;{i}{k}{a}{t}{e}&#39;</span> <span class="s">&#39;{i}{k}{a}{n}&#39;</span> <span class="s">&#39;{i}{s}&#39;</span> <span class="s">&#39;{i}{s}{a}{n}&#39;</span> <span class="s">&#39;{i}{s}{a}{t}{e}&#39;</span> <span class="s">&#39;{i}{s}{e}{y}&#39;</span> <span class="s">&#39;{i}{s}{e}{s}&#39;</span> <span class="s">&#39;{i}{s}{o}{u}{n}&#39;</span>
+      <span class="s">&#39;{i}{s}{oo}&#39;</span> <span class="s">&#39;{o}&#39;</span> <span class="s">&#39;{o}{y}&#39;</span> <span class="s">&#39;{o}{m}{a}{y}&#39;</span> <span class="s">&#39;{o}{m}{a}{s}{t}{a}{n}&#39;</span> <span class="s">&#39;{o}{m}{o}{u}{n}&#39;</span> <span class="s">&#39;{o}{m}{o}{u}{n}{a}&#39;</span> <span class="s">&#39;{o}{n}{t}{a}{y}&#39;</span> <span class="s">&#39;{o}{n}{t}{a}{n}&#39;</span>
+      <span class="s">&#39;{o}{n}{t}{o}{u}{s}{a}{n}&#39;</span> <span class="s">&#39;{o}{s}&#39;</span> <span class="s">&#39;{o}{s}{a}{s}{t}{a}{n}&#39;</span> <span class="s">&#39;{o}{s}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{o}{s}{o}{u}{n}&#39;</span> <span class="s">&#39;{o}{s}{o}{u}{n}{a}&#39;</span> <span class="s">&#39;{o}{t}{a}{n}&#39;</span> <span class="s">&#39;{o}{u}&#39;</span> <span class="s">&#39;{o}{u}{m}{a}{y}&#39;</span>
+      <span class="s">&#39;{o}{u}{m}{a}{s}{t}{e}&#39;</span> <span class="s">&#39;{o}{u}{n}&#39;</span> <span class="s">&#39;{o}{u}{n}{t}{a}{y}&#39;</span> <span class="s">&#39;{o}{u}{n}{t}{a}{n}&#39;</span> <span class="s">&#39;{o}{u}{s}&#39;</span> <span class="s">&#39;{o}{u}{s}{a}{n}&#39;</span> <span class="s">&#39;{o}{u}{s}{a}{t}{e}&#39;</span> <span class="s">&#39;{u}&#39;</span> <span class="s">&#39;{u}{s}&#39;</span> <span class="s">&#39;{oo}&#39;</span>
+      <span class="s">&#39;{oo}{n}&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="kd">define</span> <span class="n">step7</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
+      <span class="s">&#39;{e}{s}{t}{e}{r}&#39;</span> <span class="s">&#39;{e}{s}{t}{a}{t}&#39;</span> <span class="s">&#39;{o}{t}{e}{r}&#39;</span> <span class="s">&#39;{o}{t}{a}{t}&#39;</span> <span class="s">&#39;{u}{t}{e}{r}&#39;</span> <span class="s">&#39;{u}{t}{a}{t}&#39;</span> <span class="s">&#39;{oo}{t}{e}{r}&#39;</span> <span class="s">&#39;{oo}{t}{a}{t}&#39;</span> <span class="p">(</span><span class="ow">delete</span><span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">stem</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">backwards</span> <span class="p">(</span>
+      <span class="ow">do</span> <span class="n">tolower</span>
+      <span class="n">has_min_length</span>
+      <span class="ow">set</span> <span class="n">test1</span>
+      <span class="ow">do</span> <span class="n">step1</span>
+      <span class="ow">do</span> <span class="n">steps1</span>
+      <span class="ow">do</span> <span class="n">steps2</span>
+      <span class="ow">do</span> <span class="n">steps3</span>
+      <span class="ow">do</span> <span class="n">steps4</span>
+      <span class="ow">do</span> <span class="n">steps5</span>
+      <span class="ow">do</span> <span class="n">steps6</span>
+      <span class="ow">do</span> <span class="n">steps7</span>
+      <span class="ow">do</span> <span class="n">steps8</span>
+      <span class="ow">do</span> <span class="n">steps9</span>
+      <span class="ow">do</span> <span class="n">steps10</span>
+      <span class="ow">do</span> <span class="n">step2a</span>
+      <span class="ow">do</span> <span class="n">step2b</span>
+      <span class="ow">do</span> <span class="n">step2c</span>
+      <span class="ow">do</span> <span class="n">step2d</span>
+      <span class="ow">do</span> <span class="n">step3</span>
+      <span class="ow">do</span> <span class="n">step4</span>
+      <span class="ow">do</span> <span class="n">step5a</span>
+      <span class="ow">do</span> <span class="n">step5b</span>
+      <span class="ow">do</span> <span class="n">step5c</span>
+      <span class="ow">do</span> <span class="n">step5d</span>
+      <span class="ow">do</span> <span class="n">step5e</span>
+      <span class="ow">do</span> <span class="n">step5f</span>
+      <span class="ow">do</span> <span class="n">step5g</span>
+      <span class="ow">do</span> <span class="n">step5h</span>
+      <span class="ow">do</span> <span class="n">step5j</span>
+      <span class="ow">do</span> <span class="n">step5i</span>
+      <span class="ow">do</span> <span class="n">step5k</span>
+      <span class="ow">do</span> <span class="n">step5l</span>
+      <span class="ow">do</span> <span class="n">step5m</span>
+      <span class="ow">do</span> <span class="n">step6</span>
+      <span class="ow">do</span> <span class="n">step7</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+
+        </div><!-- /.col-md-10 -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+
+    <div class="container">
+      <footer class="footer">
+        <p>
+          <a href="/lists.html">Write to our mailing list</a> if you have comments or questions about the project.
+        </p>
+      </footer>
+    </div> <!-- /container -->
+    <script src="https://cdn.jsdelivr.net/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>
