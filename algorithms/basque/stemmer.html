@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="/favicon.ico">
-    <title>A Basque stemming algorithm - Snowball</title>
+    <title>Basque stemming algorithm - Snowball</title>
     <link href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <link href="/styles.css" rel="stylesheet">
     <!--[if lt IE 9]>
@@ -47,56 +47,102 @@
           
         </div>
         <div class="col-md-10">
-          <h1>A Basque stemming algorithm</h1>
+          <h1>Basque stemming algorithm</h1>
+
 
 <h2>Links to resources</h2>
 
 <ul>
-<li> <A HREF="tarball.tgz"> Tar-gzipped file of the delivered resources</A>
-<li> <A HREF="http://www.santurtzieus.com/gelairekia/unitateak/3/lagun/atzizkien_zerrenda.htm"> Basque suffixes</A> (as referenced below)
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball/master/algorithms/basque.sbl">The stemmer in Snowball</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/basque/voc.txt">Sample Basque vocabulary</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/basque/output.txt">Its stemmed equivalent</a></li>
 </ul>
 
+<div style="background-color:lightpink">
 <p>
-A stemmer for the Basque (Euskera) language was sent us by
-Mikel Otxandorena of <A HREF="http://www.isoco.com">iSOCO</A> with this accompanying email:
+Here is a sample of Basque vocabulary, with the stemmed forms that will
+be generated with this algorithm.
 </p>
 
-<blockquote><pre>
-From: Mikel Otxandorena &lt;motxandorena&#64;isoco.com&gt;
-Date: Mon, 26 Jul 2010 13:04:19 +0200
-Subject: Basque Snowball Stemmer
+<TABLE CELLPADDING=0>
+<TR><TD>  <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+ <TD></TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+ <TD></TD><TD> <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+</TR>
 
-Hi,
-
-As I told you the other day, I am sending you a valid version of a
-Basque stemmer.
-
-I have tested it with a dictionary that I attach in the
-email and it works well.
-
-For our use of suffixes see the following table:
-
-http://www.santurtzieus.com/gelairekia/unitateak/3/lagun/atzizkien_zerrenda.htm
-
-We are open to feedback and discussion about the linguistics,
-and about the final form of the snowball implementation.
-
-Please distribute this freely, with a mention of the author and
-of the company iSOCO, that has let us share our work freely with the
-Snowball community.
-
-Kind Regards,
-
-Mikel Otxandorena
-</pre></blockquote>
+<TR><TD>
+barrutiaren<BR>
+barrutiek<BR>
+barrutien<BR>
+barrutietako<BR>
+barrutietan<BR>
+barrutik<BR>
+barrutiko<BR>
+barrutitan<BR>
+basa<BR>
+basailu<BR>
+basalto<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+barru<BR>
+barru<BR>
+barru<BR>
+barru<BR>
+barru<BR>
+barrut<BR>
+barru<BR>
+barrutit<BR>
+basa<BR>
+basailu<BR>
+basal<BR>
+</TD>
+<TD></TD><TD> </TD>
+<TD></TD><TD>
+museoan<BR>
+museoak<BR>
+museoen<BR>
+museoetan<BR>
+museoko<BR>
+musikala<BR>
+musika<BR>
+musikariekin<BR>
+musikagilea<BR>
+musikagileak<BR>
+musikagilearen<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+museo<BR>
+museo<BR>
+museo<BR>
+museo<BR>
+museo<BR>
+musi<BR>
+musi<BR>
+musikarie<BR>
+musi<BR>
+musi<BR>
+musi<BR>
+</TD>
+</TR>
+</TABLE>
+</div>
 
 <p>
-Mikel has confirmed that he wishes <A HREF="http://www.isoco.com">iSOCO</A> to be
-duly acknowledged on the Snowball site, and that the stemmer itself is
-free for use under the BSD license.
+The following letters are vowels:
 </p>
 
-<h2>The algorithm in Snowball</h2>
+<DL><DD>
+    <B><I>a  &nbsp;  e  &nbsp;  i  &nbsp;  o  &nbsp;  u</I></B>
+</DL>
+
+
+<h2>The stemming algorithm</h2>
 
 <div class="highlight"><pre><span class="kd">routines</span> <span class="p">(</span>
            <span class="n">aditzak</span>

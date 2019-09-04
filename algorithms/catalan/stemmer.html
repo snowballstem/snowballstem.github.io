@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="/favicon.ico">
-    <title>A Catalan stemming algorithm - Snowball</title>
+    <title>Catalan stemming algorithm - Snowball</title>
     <link href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <link href="/styles.css" rel="stylesheet">
     <!--[if lt IE 9]>
@@ -47,59 +47,117 @@
           
         </div>
         <div class="col-md-10">
-          <h1>A Catalan stemming algorithm</h1>
+          <h1>Catalan stemming algorithm</h1>
+
 
 <h2>Links to resources</h2>
 
 <ul>
-<li> <A HREF="tarball.tgz"> Tar-gzipped file of the delivered resources</A>
-<li> <A HREF="https://ca.wikipedia.org/wiki/Gram%C3%A0tica_del_catal%C3%A0">Catalan grammar overview</A>
-<li> <A HREF="https://ca.wikipedia.org/wiki/Llista_de_sufixos">Catalan suffixes</A> (as referenced below)
-<li> <A HREF="https://ca.wikipedia.org/wiki/Flexi%C3%B3_verbal_del_catal%C3%A0">Catalan irregular verbs</A>
-(as referenced below)
+<li> <A HREF="/algorithms/romance.html"> Romance language stemmers</A>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball/master/algorithms/catalan.sbl">The stemmer in Snowball</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/catalan/voc.txt">Sample Catalan vocabulary</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/catalan/output.txt">Its stemmed equivalent</a></li>
 </ul>
 
+<div style="background-color:lightpink">
 <p>
-A stemmer for Catalan was sent us by
-Israel Olalla of <A HREF="http://www.isoco.com">iSOCO</A> with this accompanying email:
+Here is a sample of Catalan vocabulary, with the stemmed forms that will
+be generated with this algorithm.
 </p>
 
-<blockquote><pre>
-From: Israel Olalla &lt;iolalla&#64;isoco.com&gt;
-Date: Mon, 26 Jul 2010 12:25:44 +0200
-Subject: Catalan Snowball Stemmer
+<TABLE CELLPADDING=0>
+<TR><TD>  <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+ <TD></TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+ <TD></TD><TD> <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+</TR>
 
-Hi,
+<TR><TD>
+abatuda<BR>
+abatut<BR>
+abatuts<BR>
+abbàssida<BR>
+abbàssides<BR>
+abbé<BR>
+abdalwadita<BR>
+abdalwadites<BR>
+abdicació<BR>
+abdicar<BR>
+abdicat<BR>
+abdicà<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+abat<BR>
+abat<BR>
+abat<BR>
+abbas<BR>
+abbas<BR>
+abb<BR>
+abdalwad<BR>
+abdalwad<BR>
+abdic<BR>
+abdic<BR>
+abdic<BR>
+abdic<BR>
+</TD>
+<TD></TD><TD> </TD>
+<TD></TD><TD>
+gore<BR>
+gorg<BR>
+gorga<BR>
+gorges<BR>
+gorgs<BR>
+goril<BR>
+gorja<BR>
+gorra<BR>
+gorres<BR>
+gosa<BR>
+gosadia<BR>
+gosar<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+gor<BR>
+gorg<BR>
+gorg<BR>
+gorg<BR>
+gorg<BR>
+gor<BR>
+gorj<BR>
+gorr<BR>
+gorr<BR>
+gos<BR>
+gosad<BR>
+gos<BR>
+</TD>
+</TR>
+</TABLE>
+</div>
 
-Here you can find a valid version of the Catalan stemmer.
 
-It has been tested and reviewed using the dictionary included
-with freeling and works fine.
-
-To find the suffixes we've used, see:
-   http://wapedia.mobi/ca/Llista_de_sufixos
-
-And for irregular verbs:
-   http://ca.wikipedia.org/wiki/Flexi%C3%B3_verbal_del_catal%C3%A0
-
-We are open, to feedback and discussion about the linguistics,
-and about the snowball implementation i finally did.<br>
-
-Please distribute this freely, with a mention of the author and
-of the company iSOCO, that has let us share our work freely with the
-Snowball community.
-
-Kind Regards,
-
-Israel Olalla
-</pre></blockquote>
 
 <p>
-[For distribution, see the note for the <A HREF="../basque/stemmer.html">Basque stemmer</A>.
-Our thanks to <A HREF="http://www.isoco.com">iSOCO</A>!]
+Letters in Catalan include the following accented forms,
 </p>
 
-<h2>The algorithm in Snowball</h2>
+<DL><DD>
+    <B><I>á  &nbsp;  é  &nbsp;  í  &nbsp;  ó  &nbsp;  ú  &nbsp;  à  &nbsp;  è  &nbsp;  ì  &nbsp;  ò  &nbsp;  ù &nbsp; ü  &nbsp; ï</I></B>
+</DL>
+
+<p>
+The following letters are vowels:
+</p>
+
+<DL><DD>
+    <B><I>a  &nbsp;  e  &nbsp;  i  &nbsp;  o  &nbsp;  u  &nbsp;  á  &nbsp;  é  &nbsp;  í  &nbsp;  ó  &nbsp;  ú  &nbsp;  ü   &nbsp;  ï</I></B>
+</DL>
+
+
+<h2>The stemming algorithm</h2>
 
 <div class="highlight"><pre><span class="kd">routines</span> <span class="p">(</span>
            <span class="n">cleaning</span> <span class="n">mark_regions</span>
