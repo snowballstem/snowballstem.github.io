@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>Hindi stemming algorithm - Snowball</title>
+    <link href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="/" class="pull-left"><img src="/snub-dodecahedron.gif" style="margin: 4px; height: 42px;"></a>
+          <a class="navbar-brand" href="/">Snowball</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/credits.html">Credits</a></li>
+          </ul>
+	  <span id="forkongithub"><a href="https://github.com/snowballstem/snowball">Fork me on GitHub</a></span>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          
+        </div>
+        <div class="col-md-10">
+          <h1>Hindi stemming algorithm</h1>
+
+
+<h2>Links to resources</h2>
+
+<ul>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball/master/algorithms/hindi.sbl">The stemmer in Snowball</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/hindi/voc.txt">Sample Hindi vocabulary</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/hindi/output.txt">Its stemmed equivalent</a></li>
+<li> <a href="http://www.kbcs.in/downloads/papers/StmmerHindi.pdf">"A
+Lightweight Stemmer for Hindi", A. Ramanathan and D. Rao (2003)</a>
+</ul>
+
+<p>
+This is an implementation of the "Lightweight Stemmer for Hindi" described in:
+</p>
+
+<blockquote>
+    A. Ramanathan and D. Rao (2003) A Lightweight Stemmer for Hindi
+</blockquote>
+
+<p>
+The major difference in our implementation is that rather than transliterating
+to the Latin alphabet we instead work in the original Devanagari script.  We
+have modified the suffixes in the list by converting them back to Devanagari
+like so:
+</p>
+
+<ul>
+<li> within the suffixes, "<i>a</i>" after a consonant is dropped since
+consonants have an implicit "<i>a</i>".
+<li> within the suffixes, a vowel other than "<i>a</i>" after a consonant
+is a dependent vowel (vowel sign); a vowel (including "<i>a</i>") after a
+non-consonant is an independent vowel.
+<li> to allow for the vowel at the start of each suffix being dependent or
+independent, we include each suffix twice.  For the dependent version, a
+leading "<i>a</i>" is dropped and we check that the suffix is preceded by a
+consonant (which will have an implicit "<i>a</i>").
+</ul>
+
+<p>
+The transliterations of our stems would end with "<i>a</i>" when our
+stems end in a consonant, so we also include the character <i>virama</i> in the
+list of suffixes to remove (this affects 222 words from our sample vocabulary).
+</p>
+
+<p>
+Aside from this, our implementation attempts to be faithful to the algorithm
+described in the paper, though in a few places we've had to resolve ambiguities
+in the paper:
+</p>
+
+<ul>
+
+<li>
+We assume that the whole word doesn't count as a valid suffix to remove, so we
+remove the longest suffix from the list <b>which leaves at least one character</b>.
+The paper doesn't seem to clearly state either way which is intended, but producing
+an empty stem seems unhelpful in general.  If we instead allowed an empty stem
+to be produced this would result in a different stem for 47 words out of the
+65,140 in our sample vocabulary from Hindi wikipedia.
+</li>
+
+<li>
+We add <i>a</i> to the list of suffixes to remove in figure 3.  This needed for
+the example given right at the end of section 5 to work (conflating <i>BarawIya</i>
+and <i>BarawIyawA</i>, and which §3.1 a.v strongly suggests should be in the list:
+<i>"Thus, the following suffix deletions (longest possible match) are required
+to reduce inflected forms of masculine nouns to a common stem: a A i [...]"</i>
+Adding <i>a</i> only affect 2 words out of the 65,140 in our sample vocabulary.
+</li>
+
+<li>
+We've also assumed that <i>Mh</i> in the suffix list isn't meant to match
+<i>M</i> followed by <i>h</i>.  Only one of the 65,140 words in the
+sample vocabulary stems differently due to this (and that word
+seems to be a typo).
+</li>
+
+</ul>
+
+<h2>The full algorithm in Snowball</h2>
+
+<div class="highlight"><pre><span class="c1">// An implementation of &quot;A Lightweight Stemmer for Hindi&quot;:</span>
+<span class="c1">// http://www.kbcs.in/downloads/papers/StmmerHindi.pdf</span>
+
+<span class="kd">externals</span> <span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
+
+<span class="kd">stringescapes</span> <span class="p">{}</span>
+
+<span class="c1">// The transliteration scheme used for our stringdefs matches that used in the</span>
+<span class="c1">// paper, as documented in the appendix.  It appears to match the WX notation</span>
+<span class="c1">// (https://en.wikipedia.org/wiki/WX_notation) except that WX apparently</span>
+<span class="c1">// uses &#39;z&#39; for Anunasika whereas the paper uses Mh.</span>
+<span class="c1">//</span>
+<span class="c1">// We discriminate dependent vowels by adding a leading &quot;_&quot; to their stringdef</span>
+<span class="c1">// names (mnemonic: the _ signifies removing the implicit a from the preceding</span>
+<span class="c1">// character).</span>
+
+<span class="c1">// Vowels and sonorants:</span>
+<span class="kd">stringdef</span> <span class="n">a</span>  <span class="s">&#39;{U+0905}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">A</span>  <span class="s">&#39;{U+0906}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">i</span>  <span class="s">&#39;{U+0907}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">I</span>  <span class="s">&#39;{U+0908}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">u</span>  <span class="s">&#39;{U+0909}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">U</span>  <span class="s">&#39;{U+090A}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">q</span>  <span class="s">&#39;{U+090B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">e</span>  <span class="s">&#39;{U+090F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">E</span>  <span class="s">&#39;{U+0910}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">o</span>  <span class="s">&#39;{U+0913}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">O</span>  <span class="s">&#39;{U+0914}&#39;</span>
+
+<span class="c1">// Vowel signs:</span>
+<span class="kd">stringdef</span> <span class="n">_A</span> <span class="s">&#39;{U+093E}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_i</span> <span class="s">&#39;{U+093F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_I</span> <span class="s">&#39;{U+0940}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_u</span> <span class="s">&#39;{U+0941}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_U</span> <span class="s">&#39;{U+0942}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_q</span> <span class="s">&#39;{U+0943}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_e</span> <span class="s">&#39;{U+0947}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_E</span> <span class="s">&#39;{U+0948}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_o</span> <span class="s">&#39;{U+094B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">_O</span> <span class="s">&#39;{U+094C}&#39;</span>
+
+<span class="c1">// Diacritics:</span>
+<span class="kd">stringdef</span> <span class="n">M</span>  <span class="s">&#39;{U+0902}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">H</span>  <span class="s">&#39;{U+0903}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Mh</span> <span class="s">&#39;{U+0901}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Z</span>  <span class="s">&#39;{U+093C}&#39;</span> <span class="c1">// Nukta</span>
+<span class="kd">stringdef</span> <span class="n">virama</span> <span class="s">&#39;{U+094D}&#39;</span>
+
+<span class="c1">// Velar consonants:</span>
+<span class="kd">stringdef</span> <span class="n">k</span>  <span class="s">&#39;{U+0915}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">K</span>  <span class="s">&#39;{U+0916}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">g</span>  <span class="s">&#39;{U+0917}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">G</span>  <span class="s">&#39;{U+0918}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">f</span>  <span class="s">&#39;{U+0919}&#39;</span>
+
+<span class="c1">// Palatal consonants:</span>
+<span class="kd">stringdef</span> <span class="n">c</span>  <span class="s">&#39;{U+091A}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">C</span>  <span class="s">&#39;{U+091B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">j</span>  <span class="s">&#39;{U+091C}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">J</span>  <span class="s">&#39;{U+091D}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">F</span>  <span class="s">&#39;{U+091E}&#39;</span>
+
+<span class="c1">// Retroflex consonants:</span>
+<span class="kd">stringdef</span> <span class="n">t</span>  <span class="s">&#39;{U+091F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">T</span>  <span class="s">&#39;{U+0920}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">d</span>  <span class="s">&#39;{U+0921}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">D</span>  <span class="s">&#39;{U+0922}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">N</span>  <span class="s">&#39;{U+0923}&#39;</span>
+
+<span class="c1">// Dental consonants:</span>
+<span class="kd">stringdef</span> <span class="n">w</span>  <span class="s">&#39;{U+0924}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">W</span>  <span class="s">&#39;{U+0925}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">x</span>  <span class="s">&#39;{U+0926}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">X</span>  <span class="s">&#39;{U+0927}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">n</span>  <span class="s">&#39;{U+0928}&#39;</span>
+
+<span class="c1">// Labial consonants:</span>
+<span class="kd">stringdef</span> <span class="n">p</span>  <span class="s">&#39;{U+092A}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">P</span>  <span class="s">&#39;{U+092B}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">b</span>  <span class="s">&#39;{U+092C}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">B</span>  <span class="s">&#39;{U+092D}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">m</span>  <span class="s">&#39;{U+092E}&#39;</span>
+
+<span class="c1">// Semi-vowels:</span>
+<span class="kd">stringdef</span> <span class="n">y</span>  <span class="s">&#39;{U+092F}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">r</span>  <span class="s">&#39;{U+0930}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">l</span>  <span class="s">&#39;{U+0932}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">v</span>  <span class="s">&#39;{U+0935}&#39;</span>
+
+<span class="c1">// Fricatives:</span>
+<span class="kd">stringdef</span> <span class="n">S</span>  <span class="s">&#39;{U+0936}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">R</span>  <span class="s">&#39;{U+0937}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">s</span>  <span class="s">&#39;{U+0938}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">h</span>  <span class="s">&#39;{U+0939}&#39;</span>
+
+<span class="kd">stringdef</span> <span class="n">lY</span> <span class="s">&#39;{U+0933}&#39;</span>
+
+<span class="c1">// Precomposed characters - letters + nukta:</span>
+<span class="kd">stringdef</span> <span class="n">nZ</span> <span class="s">&#39;{U+0929}&#39;</span> <span class="c1">// ≡ {n}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">rZ</span> <span class="s">&#39;{U+0931}&#39;</span> <span class="c1">// ≡ {r}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">lYZ</span> <span class="s">&#39;{U+0934}&#39;</span> <span class="c1">// ≡ {lY}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">kZ</span> <span class="s">&#39;{U+0958}&#39;</span> <span class="c1">// ≡ {k}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">KZ</span> <span class="s">&#39;{U+0959}&#39;</span> <span class="c1">// ≡ {K}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">gZ</span> <span class="s">&#39;{U+095A}&#39;</span> <span class="c1">// ≡ {g}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">jZ</span> <span class="s">&#39;{U+095B}&#39;</span> <span class="c1">// ≡ {j}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">dZ</span> <span class="s">&#39;{U+095C}&#39;</span> <span class="c1">// ≡ {d}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">DZ</span> <span class="s">&#39;{U+095D}&#39;</span> <span class="c1">// ≡ {D}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">PZ</span> <span class="s">&#39;{U+095E}&#39;</span> <span class="c1">// ≡ {P}{Z}</span>
+<span class="kd">stringdef</span> <span class="n">yZ</span> <span class="s">&#39;{U+095F}&#39;</span> <span class="c1">// ≡ {y}{Z}</span>
+
+<span class="kd">integers</span> <span class="p">(</span> <span class="n">p</span> <span class="p">)</span>
+
+<span class="kd">groupings</span> <span class="p">(</span> <span class="n">consonant</span> <span class="p">)</span>
+
+<span class="kd">routines</span> <span class="p">(</span> <span class="n">CONSONANT</span> <span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">consonant</span> <span class="s">&#39;{k}{K}{g}{G}{f}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{c}{C}{j}{J}{F}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{t}{T}{d}{D}{N}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{w}{W}{x}{X}{n}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{p}{P}{b}{B}{m}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{y}{r}{l}{v}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{S}{R}{s}{h}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{lY}&#39;</span> <span class="o">+</span>
+                 <span class="s">&#39;{Z}&#39;</span> <span class="o">+</span> <span class="c1">// Nukta</span>
+                 <span class="c1">// Precomposed characters - letter and nukta:</span>
+                 <span class="s">&#39;{nZ}{rZ}{lYZ}{kZ}{KZ}{gZ}{jZ}{dZ}{DZ}{PZ}{yZ}&#39;</span>
+
+<span class="kd">backwardmode</span> <span class="p">(</span> <span class="kd">define</span> <span class="n">CONSONANT</span> <span class="k">as</span> <span class="p">(</span> <span class="n">consonant</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">stem</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">test</span> <span class="p">(</span> <span class="ow">next</span> <span class="ow">setmark</span> <span class="n">p</span> <span class="p">)</span>
+    <span class="ow">backwards</span> <span class="p">(</span>
+        <span class="c1">// We assume in this implementation that the whole word doesn&#39;t count</span>
+        <span class="c1">// as a valid suffix to remove, so we remove the longest suffix from</span>
+        <span class="c1">// the list which leaves at least one character.  This change affects</span>
+        <span class="c1">// 47 words out of the 65,140 in the sample vocabulary from Hindi</span>
+        <span class="c1">// wikipedia.</span>
+        <span class="ow">setlimit</span> <span class="ow">tomark</span> <span class="n">p</span> <span class="k">for</span> <span class="p">([</span><span class="ow">substring</span><span class="p">])</span>
+        <span class="k">among</span> <span class="p">(</span>
+            <span class="c1">// The list below is derived from figure 3 in the paper.</span>
+            <span class="c1">//</span>
+            <span class="c1">// We perform the stemming on the Devanagari characters rather than</span>
+            <span class="c1">// transliterating to Latin, so we have adapted the list below to</span>
+            <span class="c1">// reflect this by converting suffixes back to Devanagari as</span>
+            <span class="c1">// follows:</span>
+            <span class="c1">//</span>
+            <span class="c1">// * within the suffixes, &quot;a&quot; after a consonant is dropped since</span>
+            <span class="c1">//   consonants have an implicit &quot;a&quot;.</span>
+            <span class="c1">//</span>
+            <span class="c1">// * within the suffixes, a vowel other than &quot;a&quot; after a consonant</span>
+            <span class="c1">//   is a dependent vowel (vowel sign); a vowel (including &quot;a&quot;)</span>
+            <span class="c1">//   after a non-consonant is an independent vowel.</span>
+            <span class="c1">//</span>
+            <span class="c1">// * to allow the vowel at the start of each suffix being dependent</span>
+            <span class="c1">//   or independent, we include each suffix twice.  For the</span>
+            <span class="c1">//   dependent version, a leading &quot;a&quot; is dropped and we check that</span>
+            <span class="c1">//   the suffix is preceded by a consonant (which will have an</span>
+            <span class="c1">//   implicit &quot;a&quot;).</span>
+            <span class="c1">//</span>
+            <span class="c1">// * we add &#39;{a}&#39;, which is needed for the example given right at</span>
+            <span class="c1">//   the end of section 5 to work (conflating BarawIya and</span>
+            <span class="c1">//   BarawIyawA), and which 3.1 a.iv strongly suggests should be in</span>
+            <span class="c1">//   the list:</span>
+            <span class="c1">//</span>
+            <span class="c1">//     Thus, the following suffix deletions (longest possible</span>
+            <span class="c1">//     match) are required to reduce inflected forms of masculine</span>
+            <span class="c1">//     nouns to a common stem:</span>
+            <span class="c1">//     a A i [...]</span>
+            <span class="c1">//</span>
+            <span class="c1">//   Adding &#39;{a}&#39; only affect 2 words out of the 65,140 in the</span>
+            <span class="c1">//   sample vocabulary.</span>
+            <span class="c1">//</span>
+            <span class="c1">// * The transliterations of our stems would end with &quot;a&quot; when our</span>
+            <span class="c1">//   stems end in a consonant, so we also include {virama} in the</span>
+            <span class="c1">//   list of suffixes to remove (this affects 222 words from the</span>
+            <span class="c1">//   sample vocabulary).</span>
+            <span class="c1">//</span>
+            <span class="c1">// We&#39;ve also assumed that Mh in the suffix list always means {Mh}</span>
+            <span class="c1">// and never {M}{h}{virama}.  Only one of the 65,140 words in the</span>
+            <span class="c1">// sample vocabulary stems differently due to this (and that word</span>
+            <span class="c1">// seems to be a typo).</span>
+
+            <span class="s">&#39;{virama}&#39;</span>
+
+            <span class="s">&#39;{a}&#39;</span>
+            <span class="s">&#39;{A}&#39;</span>
+            <span class="s">&#39;{i}&#39;</span>
+            <span class="s">&#39;{I}&#39;</span>
+            <span class="s">&#39;{u}&#39;</span>
+            <span class="s">&#39;{U}&#39;</span>
+            <span class="s">&#39;{e}&#39;</span>
+            <span class="s">&#39;{o}&#39;</span>
+            <span class="s">&#39;{e}{M}&#39;</span>
+            <span class="s">&#39;{o}{M}&#39;</span>
+            <span class="s">&#39;{A}{M}&#39;</span>
+            <span class="s">&#39;{u}{A}{M}&#39;</span>
+            <span class="s">&#39;{u}{e}{M}&#39;</span>
+            <span class="s">&#39;{u}{o}{M}&#39;</span>
+            <span class="s">&#39;{A}{e}{M}&#39;</span>
+            <span class="s">&#39;{A}{o}{M}&#39;</span>
+            <span class="s">&#39;{i}{y}{_A}{M}&#39;</span>
+            <span class="s">&#39;{i}{y}{_o}{M}&#39;</span>
+            <span class="s">&#39;{A}{i}{y}{_A}{M}&#39;</span>
+            <span class="s">&#39;{A}{i}{y}{_o}{M}&#39;</span>
+            <span class="s">&#39;{A}{Mh}&#39;</span>
+            <span class="s">&#39;{i}{y}{_A}{Mh}&#39;</span>
+            <span class="s">&#39;{A}{i}{y}{_A}{Mh}&#39;</span>
+            <span class="s">&#39;{a}{w}{_A}{e}{M}&#39;</span>
+            <span class="s">&#39;{a}{w}{_A}{o}{M}&#39;</span>
+            <span class="s">&#39;{a}{n}{_A}{e}{M}&#39;</span>
+            <span class="s">&#39;{a}{n}{_A}{o}{M}&#39;</span>
+            <span class="s">&#39;{a}{w}{_A}&#39;</span>
+            <span class="s">&#39;{a}{w}{_I}&#39;</span>
+            <span class="s">&#39;{I}{M}&#39;</span>
+            <span class="s">&#39;{a}{w}{_I}{M}&#39;</span>
+            <span class="s">&#39;{a}{w}{_e}&#39;</span>
+            <span class="s">&#39;{A}{w}{_A}&#39;</span>
+            <span class="s">&#39;{A}{w}{_I}&#39;</span>
+            <span class="s">&#39;{A}{w}{_I}{M}&#39;</span>
+            <span class="s">&#39;{A}{w}{_e}&#39;</span>
+            <span class="s">&#39;{a}{n}{_A}&#39;</span>
+            <span class="s">&#39;{a}{n}{_I}&#39;</span>
+            <span class="s">&#39;{a}{n}{_e}&#39;</span>
+            <span class="s">&#39;{A}{n}{_A}&#39;</span>
+            <span class="s">&#39;{A}{n}{_e}&#39;</span>
+            <span class="s">&#39;{U}{M}{g}{_A}&#39;</span>
+            <span class="s">&#39;{U}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{A}{U}{M}{g}{_A}&#39;</span>
+            <span class="s">&#39;{A}{U}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{e}{M}{g}{_e}&#39;</span>
+            <span class="s">&#39;{e}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{A}{e}{M}{g}{_e}&#39;</span>
+            <span class="s">&#39;{A}{e}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{o}{g}{_e}&#39;</span>
+            <span class="s">&#39;{o}{g}{_I}&#39;</span>
+            <span class="s">&#39;{A}{o}{g}{_e}&#39;</span>
+            <span class="s">&#39;{A}{o}{g}{_I}&#39;</span>
+            <span class="s">&#39;{e}{g}{_A}&#39;</span>
+            <span class="s">&#39;{e}{g}{_I}&#39;</span>
+            <span class="s">&#39;{A}{e}{g}{_A}&#39;</span>
+            <span class="s">&#39;{A}{e}{g}{_I}&#39;</span>
+            <span class="s">&#39;{A}{y}{_A}&#39;</span>
+            <span class="s">&#39;{A}{e}&#39;</span>
+            <span class="s">&#39;{A}{I}&#39;</span>
+            <span class="s">&#39;{A}{I}{M}&#39;</span>
+            <span class="s">&#39;{i}{e}&#39;</span>
+            <span class="s">&#39;{A}{o}&#39;</span>
+            <span class="s">&#39;{A}{i}{e}&#39;</span>
+            <span class="s">&#39;{a}{k}{r}&#39;</span>
+            <span class="s">&#39;{A}{k}{r}&#39;</span>
+
+            <span class="s">&#39;{_A}&#39;</span>
+            <span class="s">&#39;{_i}&#39;</span>
+            <span class="s">&#39;{_I}&#39;</span>
+            <span class="s">&#39;{_u}&#39;</span>
+            <span class="s">&#39;{_U}&#39;</span>
+            <span class="s">&#39;{_e}&#39;</span>
+            <span class="s">&#39;{_o}&#39;</span>
+            <span class="s">&#39;{_e}{M}&#39;</span>
+            <span class="s">&#39;{_o}{M}&#39;</span>
+            <span class="s">&#39;{_A}{M}&#39;</span>
+            <span class="s">&#39;{_u}{A}{M}&#39;</span>
+            <span class="s">&#39;{_u}{e}{M}&#39;</span>
+            <span class="s">&#39;{_u}{o}{M}&#39;</span>
+            <span class="s">&#39;{_A}{e}{M}&#39;</span>
+            <span class="s">&#39;{_A}{o}{M}&#39;</span>
+            <span class="s">&#39;{_i}{y}{_A}{M}&#39;</span>
+            <span class="s">&#39;{_i}{y}{_o}{M}&#39;</span>
+            <span class="s">&#39;{_A}{i}{y}{_A}{M}&#39;</span>
+            <span class="s">&#39;{_A}{i}{y}{_o}{M}&#39;</span>
+            <span class="s">&#39;{_A}{Mh}&#39;</span>
+            <span class="s">&#39;{_i}{y}{_A}{Mh}&#39;</span>
+            <span class="s">&#39;{_A}{i}{y}{_A}{Mh}&#39;</span>
+            <span class="s">&#39;{_I}{M}&#39;</span>
+            <span class="s">&#39;{_A}{w}{_A}&#39;</span>
+            <span class="s">&#39;{_A}{w}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{w}{_I}{M}&#39;</span>
+            <span class="s">&#39;{_A}{w}{_e}&#39;</span>
+            <span class="s">&#39;{_A}{n}{_A}&#39;</span>
+            <span class="s">&#39;{_A}{n}{_e}&#39;</span>
+            <span class="s">&#39;{_U}{M}{g}{_A}&#39;</span>
+            <span class="s">&#39;{_U}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{U}{M}{g}{_A}&#39;</span>
+            <span class="s">&#39;{_A}{U}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_e}{M}{g}{_e}&#39;</span>
+            <span class="s">&#39;{_e}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{e}{M}{g}{_e}&#39;</span>
+            <span class="s">&#39;{_A}{e}{M}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_o}{g}{_e}&#39;</span>
+            <span class="s">&#39;{_o}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{o}{g}{_e}&#39;</span>
+            <span class="s">&#39;{_A}{o}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_e}{g}{_A}&#39;</span>
+            <span class="s">&#39;{_e}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{e}{g}{_A}&#39;</span>
+            <span class="s">&#39;{_A}{e}{g}{_I}&#39;</span>
+            <span class="s">&#39;{_A}{y}{_A}&#39;</span>
+            <span class="s">&#39;{_A}{e}&#39;</span>
+            <span class="s">&#39;{_A}{I}&#39;</span>
+            <span class="s">&#39;{_A}{I}{M}&#39;</span>
+            <span class="s">&#39;{_i}{e}&#39;</span>
+            <span class="s">&#39;{_A}{o}&#39;</span>
+            <span class="s">&#39;{_A}{i}{e}&#39;</span>
+            <span class="s">&#39;{_A}{k}{r}&#39;</span>
+
+            <span class="cm">/* Suffixes with a leading implicit a: */</span>
+            <span class="s">&#39;{w}{_A}{e}{M}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{w}{_A}{o}{M}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{n}{_A}{e}{M}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{n}{_A}{o}{M}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{w}{_A}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{w}{_I}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{w}{_I}{M}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{w}{_e}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{n}{_A}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{n}{_I}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{n}{_e}&#39;</span> <span class="n">CONSONANT</span>
+            <span class="s">&#39;{k}{r}&#39;</span> <span class="n">CONSONANT</span>
+        <span class="p">)</span>
+        <span class="ow">delete</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+
+        </div><!-- /.col-md-10 -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+
+    <div class="container">
+      <footer class="footer">
+        <p>
+          <a href="/lists.html">Write to our mailing list</a> if you have comments or questions about the project.
+        </p>
+      </footer>
+    </div> <!-- /container -->
+    <script src="https://cdn.jsdelivr.net/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>
