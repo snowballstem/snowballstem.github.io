@@ -171,32 +171,32 @@ Conference
 	<span class="n">stem_suffix_chain_before_ki</span>
 <span class="p">)</span>
 
-<span class="kd">stringescapes</span> 	<span class="p">{</span> <span class="p">}</span>
+<span class="kd">stringescapes</span>	<span class="p">{</span> <span class="p">}</span>
 
 <span class="cm">/* Special characters in Unicode Latin-1 and Latin Extended-A */</span>
-<span class="kd">stringdef</span> <span class="n">c,</span>   	<span class="s">&#39;{U+00E7}&#39;</span>	<span class="c1">// LATIN SMALL LETTER C WITH CEDILLA</span>
-<span class="kd">stringdef</span> <span class="n">g~</span>   	<span class="s">&#39;{U+011F}&#39;</span>	<span class="c1">// LATIN SMALL LETTER G WITH BREVE</span>
-<span class="kd">stringdef</span> <span class="n">i&#39;</span>   	<span class="s">&#39;{U+0131}&#39;</span>	<span class="c1">// LATIN SMALL LETTER I WITHOUT DOT</span>
-<span class="kd">stringdef</span> <span class="n">o&quot;</span>  	<span class="s">&#39;{U+00F6}&#39;</span>	<span class="c1">// LATIN SMALL LETTER O WITH DIAERESIS</span>
+<span class="kd">stringdef</span> <span class="n">c,</span>	<span class="s">&#39;{U+00E7}&#39;</span>	<span class="c1">// LATIN SMALL LETTER C WITH CEDILLA</span>
+<span class="kd">stringdef</span> <span class="n">g~</span>	<span class="s">&#39;{U+011F}&#39;</span>	<span class="c1">// LATIN SMALL LETTER G WITH BREVE</span>
+<span class="kd">stringdef</span> <span class="n">i&#39;</span>	<span class="s">&#39;{U+0131}&#39;</span>	<span class="c1">// LATIN SMALL LETTER I WITHOUT DOT</span>
+<span class="kd">stringdef</span> <span class="n">o&quot;</span>	<span class="s">&#39;{U+00F6}&#39;</span>	<span class="c1">// LATIN SMALL LETTER O WITH DIAERESIS</span>
 <span class="kd">stringdef</span> <span class="n">s,</span>	<span class="s">&#39;{U+015F}&#39;</span>	<span class="c1">// LATIN SMALL LETTER S WITH CEDILLA</span>
-<span class="kd">stringdef</span> <span class="n">u&quot;</span>  	<span class="s">&#39;{U+00FC}&#39;</span>	<span class="c1">// LATIN SMALL LETTER U WITH DIAERESIS</span>
+<span class="kd">stringdef</span> <span class="n">u&quot;</span>	<span class="s">&#39;{U+00FC}&#39;</span>	<span class="c1">// LATIN SMALL LETTER U WITH DIAERESIS</span>
 
 <span class="kd">booleans</span>	<span class="p">(</span> <span class="n">continue_stemming_noun_suffixes</span> <span class="p">)</span>
 
-<span class="kd">groupings</span> 	<span class="p">(</span> <span class="n">vowel</span> <span class="n">U</span> <span class="n">vowel1</span> <span class="n">vowel2</span> <span class="n">vowel3</span> <span class="n">vowel4</span> <span class="n">vowel5</span> <span class="n">vowel6</span><span class="p">)</span>
+<span class="kd">groupings</span>	<span class="p">(</span> <span class="n">vowel</span> <span class="n">U</span> <span class="n">vowel1</span> <span class="n">vowel2</span> <span class="n">vowel3</span> <span class="n">vowel4</span> <span class="n">vowel5</span> <span class="n">vowel6</span><span class="p">)</span>
 
-<span class="kd">define</span> <span class="n">vowel</span> 	<span class="s">&#39;ae{i&#39;}io{o&quot;}u{u&quot;}&#39;</span>
+<span class="kd">define</span> <span class="n">vowel</span>	<span class="s">&#39;ae{i&#39;}io{o&quot;}u{u&quot;}&#39;</span>
 <span class="kd">define</span> <span class="n">U</span>	<span class="s">&#39;{i&#39;}iu{u&quot;}&#39;</span>
 
 <span class="c1">// the vowel grouping definitions below are used for checking vowel harmony</span>
-<span class="kd">define</span> <span class="n">vowel1</span>  	<span class="s">&#39;a{i&#39;}ou&#39;</span> 		<span class="c1">// vowels that can end with suffixes containing &#39;a&#39;</span>
-<span class="kd">define</span> <span class="n">vowel2</span>  	<span class="s">&#39;ei{o&quot;}{u&quot;}&#39;</span> 		<span class="c1">// vowels that can end with suffixes containing &#39;e&#39;</span>
-<span class="kd">define</span> <span class="n">vowel3</span>  	<span class="s">&#39;a{i&#39;}&#39;</span> 		<span class="c1">// vowels that can end with suffixes containing &#39;i&#39;&#39;</span>
-<span class="kd">define</span> <span class="n">vowel4</span>  	<span class="s">&#39;ei&#39;</span>	 		<span class="c1">// vowels that can end with suffixes containing &#39;i&#39;</span>
-<span class="kd">define</span> <span class="n">vowel5</span>  	<span class="s">&#39;ou&#39;</span>	 		<span class="c1">// vowels that can end with suffixes containing &#39;o&#39; or &#39;u&#39;</span>
-<span class="kd">define</span> <span class="n">vowel6</span>  	<span class="s">&#39;{o&quot;}{u&quot;}&#39;</span> 		<span class="c1">// vowels that can end with suffixes containing &#39;o&quot;&#39; or &#39;u&quot;&#39;</span>
+<span class="kd">define</span> <span class="n">vowel1</span>	<span class="s">&#39;a{i&#39;}ou&#39;</span>		<span class="c1">// vowels that can end with suffixes containing &#39;a&#39;</span>
+<span class="kd">define</span> <span class="n">vowel2</span>	<span class="s">&#39;ei{o&quot;}{u&quot;}&#39;</span>		<span class="c1">// vowels that can end with suffixes containing &#39;e&#39;</span>
+<span class="kd">define</span> <span class="n">vowel3</span>	<span class="s">&#39;a{i&#39;}&#39;</span>			<span class="c1">// vowels that can end with suffixes containing &#39;i&#39;&#39;</span>
+<span class="kd">define</span> <span class="n">vowel4</span>	<span class="s">&#39;ei&#39;</span>			<span class="c1">// vowels that can end with suffixes containing &#39;i&#39;</span>
+<span class="kd">define</span> <span class="n">vowel5</span>	<span class="s">&#39;ou&#39;</span>			<span class="c1">// vowels that can end with suffixes containing &#39;o&#39; or &#39;u&#39;</span>
+<span class="kd">define</span> <span class="n">vowel6</span>	<span class="s">&#39;{o&quot;}{u&quot;}&#39;</span>		<span class="c1">// vowels that can end with suffixes containing &#39;o&quot;&#39; or &#39;u&quot;&#39;</span>
 
-<span class="kd">externals</span> 	<span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
+<span class="kd">externals</span>	<span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
 
 <span class="kd">backwardmode</span> <span class="p">(</span>
 	<span class="c1">// checks vowel harmony for possible suffixes,</span>
@@ -467,24 +467,24 @@ Conference
 		<span class="ow">or</span>
 		<span class="p">([(</span><span class="n">mark_ndA</span> <span class="ow">or</span> <span class="n">mark_nA</span><span class="p">)</span>
 			<span class="p">(</span>
-		  		<span class="p">(</span><span class="n">mark_lArI</span><span class="p">]</span> <span class="ow">delete</span><span class="p">)</span>
-		  		<span class="ow">or</span>
-		  		<span class="p">(</span><span class="n">mark_sU</span><span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">([</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
-		  		<span class="ow">or</span>
-		  		<span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">)</span>
-		  	<span class="p">)</span>
+				<span class="p">(</span><span class="n">mark_lArI</span><span class="p">]</span> <span class="ow">delete</span><span class="p">)</span>
+				<span class="ow">or</span>
+				<span class="p">(</span><span class="n">mark_sU</span><span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">([</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
+				<span class="ow">or</span>
+				<span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">)</span>
+			<span class="p">)</span>
 		<span class="p">)</span>
 		<span class="ow">or</span>
 		<span class="p">([(</span><span class="n">mark_ndAn</span> <span class="ow">or</span> <span class="n">mark_nU</span><span class="p">)</span> <span class="p">((</span><span class="n">mark_sU</span> <span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">([</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">mark_lArI</span><span class="p">)))</span>
 		<span class="ow">or</span>
 		<span class="p">(</span> <span class="p">[</span><span class="n">mark_DAn</span><span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span> <span class="p">([</span>
 			<span class="p">(</span>
-		 		<span class="p">(</span><span class="n">mark_possessives</span> <span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">([</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
-		 		<span class="ow">or</span>
-		 		<span class="p">(</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
-		 		<span class="ow">or</span>
-		 		<span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">)</span>
-		 	<span class="p">))</span>
+				<span class="p">(</span><span class="n">mark_possessives</span> <span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">([</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
+				<span class="ow">or</span>
+				<span class="p">(</span><span class="n">mark_lAr</span><span class="p">]</span> <span class="ow">delete</span> <span class="ow">try</span><span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">))</span>
+				<span class="ow">or</span>
+				<span class="p">(</span><span class="n">stem_suffix_chain_before_ki</span><span class="p">)</span>
+			<span class="p">))</span>
 		<span class="p">)</span>
 		<span class="ow">or</span>
 		<span class="p">([</span><span class="n">mark_nUn</span> <span class="ow">or</span> <span class="n">mark_ylA</span><span class="p">]</span> <span class="ow">delete</span>
