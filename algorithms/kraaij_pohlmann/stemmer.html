@@ -316,11 +316,8 @@ Here then is the Snowball equivalent of the Kraaij-Pohlmann algorithm.
 <span class="p">)</span>
 
 <span class="kd">define</span> <span class="n">measure</span> <span class="k">as</span> <span class="p">(</span>
-    <span class="ow">do</span> <span class="p">(</span>
-        <span class="ow">tolimit</span>
-        <span class="ow">setmark</span> <span class="n">p1</span>
-        <span class="ow">setmark</span> <span class="n">p2</span>
-    <span class="p">)</span>
+    <span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="ow">limit</span>
+    <span class="o">$</span><span class="n">p2</span> <span class="o">=</span> <span class="ow">limit</span>
     <span class="ow">do</span><span class="p">(</span>
         <span class="ow">repeat</span> <span class="ow">non-</span><span class="n">v</span>  <span class="ow">atleast</span> <span class="m">1</span> <span class="p">(</span><span class="s">&#39;ij&#39;</span> <span class="ow">or</span> <span class="n">v</span><span class="p">)</span>  <span class="ow">non-</span><span class="n">v</span>  <span class="ow">setmark</span> <span class="n">p1</span>
         <span class="ow">repeat</span> <span class="ow">non-</span><span class="n">v</span>  <span class="ow">atleast</span> <span class="m">1</span> <span class="p">(</span><span class="s">&#39;ij&#39;</span> <span class="ow">or</span> <span class="n">v</span><span class="p">)</span>  <span class="ow">non-</span><span class="n">v</span>  <span class="ow">setmark</span> <span class="n">p2</span>
