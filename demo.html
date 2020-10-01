@@ -28,7 +28,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a href="/" class="pull-left"><img src="/snub-dodecahedron.gif" style="margin: 4px; height: 42px;"></a>
+          <a href="/" class="pull-left"><img src="/snub-dodecahedron.gif" alt="Snowball Logo" style="margin: 4px; height: 42px;"></a>
           <a class="navbar-brand" href="/">Snowball</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
@@ -75,13 +75,13 @@ Try the
 <select id="lang" onchange="lang_changed(this);"><option value='Arabic'>Arabic</option><option value='Basque'>Basque</option><option value='Catalan'>Catalan</option><option value='Danish'>Danish</option><option value='Dutch'>Dutch</option><option value='English' selected>English</option><option value='Finnish'>Finnish</option><option value='French'>French</option><option value='German'>German</option><option value='Greek'>Greek</option><option value='Hindi'>Hindi</option><option value='Hungarian'>Hungarian</option><option value='Indonesian'>Indonesian</option><option value='Irish'>Irish</option><option value='Italian'>Italian</option><option value='Lithuanian'>Lithuanian</option><option value='Nepali'>Nepali</option><option value='Norwegian'>Norwegian</option><option value='Porter'>Porter</option><option value='Portuguese'>Portuguese</option><option value='Romanian'>Romanian</option><option value='Russian'>Russian</option><option value='Serbian'>Serbian</option><option value='Spanish'>Spanish</option><option value='Swedish'>Swedish</option><option value='Tamil'>Tamil</option><option value='Turkish'>Turkish</option></select>stemming algorithm:
 </p>
 <table border='0'><tr><td width="50%">
-<textarea id="words" rows=1 cols=50 placeholder="Enter some English text" oninput="stem_demo(this);">
+<textarea id="words" rows="1" cols="50" placeholder="Enter some English text" oninput="stem_demo(this);">
 </textarea>
 </td>
 <td id="results" class="license" style='border:1px;border-style:solid;'></td>
 </tr></table>
 
-<script language=javascript src="js/stemmers.js"></script>
+<script language="javascript" src="js/stemmers.js"></script>
 <script>
 var old_words;
 function stem_demo(elt) {
