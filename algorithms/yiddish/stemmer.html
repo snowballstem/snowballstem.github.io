@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>Yiddish stemming algorithm - Snowball</title>
+    <link href="https://cdn.jsdelivr.net/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="/" class="pull-left"><img src="/snub-dodecahedron.gif" alt="Snowball Logo" style="margin: 4px; height: 42px;"></a>
+          <a class="navbar-brand" href="/">Snowball</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/credits.html">Credits</a></li>
+          </ul>
+	  <span id="forkongithub"><a href="https://github.com/snowballstem/snowball">Fork me on GitHub</a></span>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+          
+        </div>
+        <div class="col-md-10">
+          <h1>Yiddish stemming algorithm</h1>
+
+
+<h2>Links to resources</h2>
+
+<ul>
+<li> <A HREF="/algorithms/germanic.html"> Germanic language stemmers</A></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball/master/algorithms/yiddish.sbl">The stemmer in Snowball</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/yiddish/voc.txt">Sample Yiddish vocabulary</a></li>
+<li> <a href="https://raw.githubusercontent.com/snowballstem/snowball-data/master/yiddish/output.txt">Its stemmed equivalent</a></li>
+</ul>
+
+<div style="background-color:lightpink">
+
+<p>
+Here is a sample of Yiddish vocabulary, with the stemmed forms that will
+be generated with this algorithm.
+</p>
+
+<TABLE CELLPADDING=0>
+<TR><TD>  <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+ <TD></TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+ <TD></TD><TD> <B>word</B> </TD>
+ <TD></TD><TD> </TD>
+ <TD></TD><TD> <B>stem</B> </TD>
+</TR>
+
+<TR><TD>
+בענטש<BR>
+בענטשונג<BR>
+בענטשונגען<BR>
+בענטשט<BR>
+בענטשליכט<BR>
+בענטשן<BR>
+בענטשנדיק<BR>
+בענטשנדיקן<BR>
+בענטשנדיקס<BR>
+בענטשנדיקע<BR>
+בענטשנדיקער<BR>
+בענטשסט<BR>
+בענטשסטו<BR>
+בענעפֿיט<BR>
+בענעפֿיטן<BR>
+בענק<BR>
+בענקאַרט<BR>
+בענקאַרטן<BR>
+בענקט<BR>
+בענקל<BR>
+בענקלעך<BR>
+בענקנדיקערהײט<BR>
+בענקסט<BR>
+בענקסטו<BR>
+בענקעלע<BR>
+בענקעלעך<BR>
+בענקען<BR>
+בענקענדיק<BR>
+בענקענדיקן<BR>
+בענקענדיקס<BR>
+בענקענדיקע<BR>
+בענקענדיקער<BR>
+בענקעניש<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטשליכ<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענטש<BR>
+בענעפי<BR>
+בענעפי<BR>
+בענק<BR>
+בענקאר<BR>
+בענקאר<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענקנדיקער<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענק<BR>
+בענקענ<BR>
+</TD>
+<TD></TD><TD> </TD>
+<TD></TD><TD>
+כאַראַקטער<BR>
+כאַראַקטעריזיר<BR>
+כאַראַקטעריזירט<BR>
+כאַראַקטעריזירטן<BR>
+כאַראַקטעריזירטס<BR>
+כאַראַקטעריזירטע<BR>
+כאַראַקטעריזירטער<BR>
+כאַראַקטעריזירן<BR>
+כאַראַקטעריזירנדיק<BR>
+כאַראַקטעריזירנדיקן<BR>
+כאַראַקטעריזירנדיקס<BR>
+כאַראַקטעריזירנדיקע<BR>
+כאַראַקטעריזירנדיקער<BR>
+כאַראַקטעריזירסט<BR>
+כאַראַקטעריזירסטו<BR>
+כאַראַקטעריסטיק<BR>
+כאַראַקטעריסטיקן<BR>
+כאַראַקטעריסטיש<BR>
+כאַראַקטעריסטישן<BR>
+כאַראַקטעריסטישע<BR>
+כאַראַקטעריסטישעס<BR>
+כאַראַקטעריסטישער<BR>
+כאַראַקטעריש<BR>
+כאַראַקטערישן<BR>
+כאַראַקטערישע<BR>
+כאַראַקטערישעס<BR>
+כאַראַקטערישער<BR>
+כאַראַקטערן<BR>
+כאַראַקטערס<BR>
+כאַרט<BR>
+כאַרטן<BR>
+כאַרטעס<BR>
+כאַריזמאַטיש<BR>
+כאַריזמאַטישן<BR>
+כאַריזמאַטישע<BR>
+כאַריזמאַטישעס<BR>
+כאַריזמאַטישער<BR>
+</TD>
+<TD></TD><TD> <b>&#x21d2;</b> </TD>
+<TD></TD><TD>
+כאראק<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריזיר<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטעריסט<BR>
+כאראקטער<BR>
+כאראקטער<BR>
+כאראקטער<BR>
+כאראקטער<BR>
+כאראקטער<BR>
+כאראקטער<BR>
+כאראקט<BR>
+כאר<BR>
+כאר<BR>
+כארט<BR>
+כאריזמאט<BR>
+כאריזמאט<BR>
+כאריזמאט<BR>
+כאריזמאט<BR>
+כאריזמאט<BR>
+</TD>
+</TR>
+</TABLE>
+</div>
+
+<h2>The stemming algorithm</h2>
+
+<h3>Groupings</h3>
+<p>We setup the following groupings:</p>
+
+<dl>
+  <dt>Niked</dt>
+  <dd>All niked used in Yiddish and Hebrew</dd>
+  <dt>AlefBeys</dt>
+  <dd>
+    All actual letters in the Hebrew alphabet, including:
+    <li>The alphabet itself: א ב ג ד ה ו ז ח ט י כ ל מ נ ס ע פ צ ק ר ש ת</li>
+    <li>Final consonants: ך ם ן ף ץ</li>
+    <li>Ligatures: װ ױ ײ</li>
+  </dd>
+  <dt>Vowel</dt>
+  <dd>א ו י ע ױ ײ</dd>
+  <dt>Consonant</dt>
+  <dd>AlefBeys - Vowel</dd>
+</dl>
+
+<h3>Pre-processing</h3>
+<ul>
+  <li>We replace two ו, where the second one is not וּ, with װ.</li>
+  <li>We replace ו י, where the י is not a יִ, with ױ.</li>
+  <li>We replace two י, where the second one is not a יִ, with ײ.</li>
+  <li>We replace final forms (e.g. ץ) with their normal form (e.g. צ).</li>
+  <li>We remove all niked.</li>
+</ul>
+
+<h3>Marking regions</h3>
+<p>
+  Only a single marker is used: P1.
+  To begin with, this is set at the end of the word.
+</p>
+
+<ul>
+  <li>If the word begins with גע, it is replaced with "GE" and the cursor is advanced.</li>
+  <li>
+    Next, if the word begins with any verbal prefix, the cursor is advanced past this prefix.
+    Prefixes include (niked added for clarity, not included in algorithm):
+  </li>
+  <ul>
+    <li>Free stressed: אַדורכ, דורכ, אַהינ, אַהער, אַװעק, מיט, אַנטקעגנ, אַקעגנ, אַנידער, אַרױס, אַרױפ, אַרומ, אַרײנ, אַרונטער, אַריבער, נאָכ, פאַרבײַ, אַהײמ, אַפיר, פאַרױס, פונאַנדער, צוזאַמענ, צונױפ, צוריק.</li>
+    <li>Stressed: אױס, אױפ, אומ, אונטער, איבער, אײֲנ, אָנ, אָפּ, בײַ, פאָר, צו.</li>
+    <li>Unstressed: אַנט, באַ, דער, צע</li>
+  </ul>
+  <li>If the verbal prefix is followed by גע, it is replaced with "GE" and the cursor is advanced (e.g. אַװעקגעגאַנגען).</li>
+  <li>If the verbal prefix is followed by צו, it is replaced with "TSU" and the cursor is advanced (e.g. אַרומצוגײן).</li>
+</ul>
+
+<p>We are now at the start of the main portion of the word (past any verbal prefix and past participle marker).</p>
+
+<ul>
+  <li>The following valid Yiddish three-consonant sequences are skipped: שפר, שטר, שטש, דזש.</li>
+  <li>If there is a sequence of three consonants, the cursor is advanced past them, and P1 is marked.</li>
+  <li>Otherwise, the cursor is advanced to the first vowel, and then up to the first non-vowel, minus 1, and P1 is marked.</li>
+  <li>If P1 is not at least 3 letters beyond the main portion, it is advanced past the 3rd letter.</li>
+</ul>
+
+<h3>Backwards mode</h3>
+
+<p>Unless otherwise stated, all deletes ensure we are beyond P1.</p>
+<p>In each pass, at the first level of bullets, the longest matching suffix always wins.</p>
+
+<p>First pass:</p>
+<ul>
+  <li>Delete plural/adjective endings: ער, ערס, ן, ס, ען, נס, ענערס, ענס, עס.</li>
+  <ul>
+    <li>Exceptions: יע is not deleted (e.g. אגיטאַציע), יעס becomes יע</li>
+  </ul>
+  <li>Delete plural/adjective endings: ענעם, ענער, ענע, ענס</li>
+  <ul>
+    <li>If preceded by an irregular past participle ending in ן, replace it with the stem, e.g. געגאַנגען becomes גײ.</li>
+  </ul>
+  <li>Delete the verb/past participle ending: ט.</li>
+  <ul>
+    <li>Because of the above, also delete noun/adjectives ending in טן, טע, טער, טס so that they stem identically to the equivalent noun with the ט.</li>
+    <li>Similarly for past participles: -tns, -tene, -tenem, -tener טנס, טענע, טענעם, טענער</li>
+    <li>If the ט was before P1, we try to perform the same action while leaving the ט in place</li>
+    <li>At the same time, if preceded by an irregular past participles ending in ט, replace it with the stem, e.g. געבראַכט becomes ברענג.</li>
+  </ul>
+  <li>Anything ending with גײן is transformed to גײ.</li>
+  <li>Anything ending in an irregular past participle is corrected to the stem.</li>
+  <li>Delete noun endings: ונג, הײט, קײט, יקײט, שאַפֿט.</li>
+  <li>Delete noun endings: יזם, יזמס.</li>
+  <li>Delete Hebraic plural ending: ים</li>
+  <li>Replace the Hebraic plural ending ות with ה.</li>
+  <li>Delete the diminutive endings: עלעך, עלע, לעך, עלעס, עלען.</li>
+  <li>Delete the noun endings: יסט, יסטן.</li>
+  <ul>
+    <li>Exceptions to the above: words ending in גיסט or שיסט.</li>
+  </ul>
+  <li>Delete the verb ending סטו.</li>
+  <li>Delete the uperlative endings: סטער, סטע, סטן.</li>
+  <li>Delete the verb ending: סט.</li>
+</ul>
+
+<p>Second pass - after the first pass, do the following to the remaining stem:</p>
+<ul>
+  <li>Delete noun endings: ונג, הײט, קײט, יקײט, שאַפֿט.</li>
+  <li>Delete the diminutive ending ל if it follows a consonant.</li>
+</ul>
+
+<p>Third pass - after the second pass, do the following to the remaining stem:</p>
+<ul>
+  <li>Delete the adjective endings יק, יג, ניק, דיק, יש, for words like אָפהענגיקײט.</li>
+  <ul>
+    <li>Exceptions to the above: words ending in גליק or בליק.</li>
+  </ul>
+  <li>Delete the present participle ending: נדיק</li>
+  <li>
+    Delete the present participle ending ענדיק if it follows נג, נק, נ, מ, a consonant and ל or a vowel.
+    Otherwise, delete just the נדיק portion.
+  </li>
+</ul>
+
+Finally, all remaining GE and TSU are deleted.
+
+<h2>The same algorithm in Snowball</h2>
+
+<div class="highlight"><pre><span class="cm">/* *******************************************</span>
+<span class="cm"> * Stemmer for Yiddish language in YIVO script</span>
+<span class="cm"> *</span>
+<span class="cm"> * Author: Assaf Urieli</span>
+<span class="cm"> * Emails: assaf.urieli at gmail.com</span>
+<span class="cm"> * Version: 0.1 (15.05.2020)</span>
+<span class="cm"> *</span>
+<span class="cm"> ********************************************* */</span>
+
+<span class="kd">routines</span> <span class="p">(</span>
+       <span class="n">prelude</span>
+       <span class="n">mark_regions</span>
+       <span class="n">R1</span>
+       <span class="n">standard_suffix</span>
+<span class="p">)</span>
+
+<span class="kd">externals</span> <span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
+
+<span class="kd">integers</span> <span class="p">(</span> <span class="n">p1</span> <span class="n">x</span> <span class="p">)</span>
+
+<span class="kd">groupings</span> <span class="p">(</span> <span class="n">vowel</span> <span class="n">niked</span> <span class="n">alefBeys</span> <span class="n">consonant</span> <span class="p">)</span>
+
+<span class="kd">stringescapes</span> <span class="p">{}</span>
+
+<span class="c1">// AlefBeys</span>
+<span class="kd">stringdef</span> <span class="n">Alef</span>         <span class="s">&#39;{U+05D0}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Beys</span>         <span class="s">&#39;{U+05D1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Giml</span>         <span class="s">&#39;{U+05D2}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Dalet</span>        <span class="s">&#39;{U+05D3}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Hey</span>          <span class="s">&#39;{U+05D4}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Vov</span>          <span class="s">&#39;{U+05D5}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Zayen</span>        <span class="s">&#39;{U+05D6}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Khes</span>         <span class="s">&#39;{U+05D7}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Tes</span>          <span class="s">&#39;{U+05D8}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Yud</span>          <span class="s">&#39;{U+05D9}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">LangerKhof</span>   <span class="s">&#39;{U+05DA}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Khof</span>         <span class="s">&#39;{U+05DB}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Lamed</span>        <span class="s">&#39;{U+05DC}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ShlosMem</span>     <span class="s">&#39;{U+05DD}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Mem</span>          <span class="s">&#39;{U+05DE}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">LangerNun</span>    <span class="s">&#39;{U+05DF}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Nun</span>          <span class="s">&#39;{U+05E0}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Samekh</span>       <span class="s">&#39;{U+05E1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Ayen</span>         <span class="s">&#39;{U+05E2}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">LangerFey</span>    <span class="s">&#39;{U+05E3}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Fey</span>          <span class="s">&#39;{U+05E4}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">LangerTsadek</span> <span class="s">&#39;{U+05E5}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Tsadek</span>       <span class="s">&#39;{U+05E6}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Kuf</span>          <span class="s">&#39;{U+05E7}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Reysh</span>        <span class="s">&#39;{U+05E8}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Shin</span>         <span class="s">&#39;{U+05E9}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Sof</span>          <span class="s">&#39;{U+05EA}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">TsveyVovn</span>    <span class="s">&#39;{U+05F0}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">VovYud</span>       <span class="s">&#39;{U+05F1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">TsveyYudn</span>    <span class="s">&#39;{U+05F2}&#39;</span>
+
+<span class="c1">// Niked</span>
+<span class="kd">stringdef</span> <span class="n">Shvo</span>          <span class="s">&#39;{U+05B0}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Khirik</span>        <span class="s">&#39;{U+05B4}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Tseyre</span>        <span class="s">&#39;{U+05B5}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Segl</span>          <span class="s">&#39;{U+05B6}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ReducedSegl</span>   <span class="s">&#39;{U+05B1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Pasekh</span>        <span class="s">&#39;{U+05B7}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ReducedPasekh</span> <span class="s">&#39;{U+05B2}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Komets</span>        <span class="s">&#39;{U+05B8}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ReducedKomets</span> <span class="s">&#39;{U+05B3}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Rafe</span>          <span class="s">&#39;{U+05BF}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">SinDot</span>        <span class="s">&#39;{U+05C2}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">ShinDot</span>       <span class="s">&#39;{U+05C1}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Khoylm</span>        <span class="s">&#39;{U+05B9}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Melupm</span>        <span class="s">&#39;{U+05BC}&#39;</span>
+<span class="kd">stringdef</span> <span class="n">Kubuts</span>        <span class="s">&#39;{U+05BB}&#39;</span>
+
+<span class="c1">// Groupings</span>
+<span class="kd">define</span> <span class="n">niked</span>       <span class="s">&#39;{Shvo}{Khirik}{Tseyre}{Segl}{ReducedSegl}{Pasekh}{ReducedPasekh}{Komets}{ReducedKomets}{SinDot}{ShinDot}{Khoylm}{Melupm}{Kubuts}{Rafe}&#39;</span>
+<span class="kd">define</span> <span class="n">alefBeys</span>    <span class="s">&#39;{Alef}{Beys}{Giml}{Dalet}{Hey}{Vov}{Zayen}{Khes}{Tes}{Yud}{LangerKhof}{Khof}{Lamed}{ShlosMem}{Mem}{LangerNun}{Nun}{Samekh}{Ayen}{LangerFey}{Fey}{LangerTsadek}{Tsadek}{Kuf}{Reysh}{Shin}{Sof}{TsveyVovn}{VovYud}{TsveyYudn}&#39;</span>
+<span class="kd">define</span> <span class="n">vowel</span>           <span class="s">&#39;{Alef}{Vov}{Yud}{Ayen}{VovYud}{TsveyYudn}&#39;</span>
+<span class="kd">define</span> <span class="n">consonant</span>   <span class="n">alefBeys</span> <span class="o">-</span> <span class="n">vowel</span>
+
+<span class="kd">define</span> <span class="n">prelude</span> <span class="k">as</span> <span class="p">(</span>
+  <span class="ow">do</span> <span class="p">(</span>
+    <span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{Vov}{Vov}&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="s">&#39;{Melupm}&#39;</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyVovn}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{Vov}{Yud}&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="s">&#39;{Khirik}&#39;</span> <span class="o">&lt;-</span> <span class="s">&#39;{VovYud}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{Yud}{Yud}&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="s">&#39;{Khirik}&#39;</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyYudn}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{LangerKhof}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Khof}&#39;</span><span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{ShlosMem}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Mem}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{LangerNun}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Nun}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{LangerFey}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Fey}&#39;</span> <span class="p">)</span>
+      <span class="ow">or</span>
+      <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{LangerTsadek}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tsadek}&#39;</span> <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">)</span>
+
+  <span class="ow">do</span> <span class="p">(</span><span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span> <span class="p">[</span><span class="n">niked</span><span class="p">]</span> <span class="ow">delete</span> <span class="p">))</span>
+<span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">mark_regions</span> <span class="k">as</span> <span class="p">(</span>
+  <span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="ow">limit</span>
+
+  <span class="p">(</span>
+    <span class="ow">try</span> <span class="p">(</span>
+      <span class="c1">// Replace past participle ge- at start of word</span>
+      <span class="p">[</span><span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span>
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;GE&#39;</span> <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="ow">try</span> <span class="p">(</span>
+      <span class="c1">// skip verbal prefix</span>
+      <span class="k">among</span><span class="p">(</span>
+        <span class="c1">// Free stressed: Adurkh-, Durkh-, Ahin-, Aher-, Avek-, Mit-, Antkegn-, Akegn-, Anider-, Arop-, Aroys-, Aroyf-, Arum-, Arayn-, Arunter-, Ariber-, Nokh-, Farbay-, Aheym-, Afir-, Faroys-, Funander-, Tsuzamen-, Tsunoyf-, Tsurik-</span>
+        <span class="s">&#39;{Alef}{Dalet}{Vov}{Reysh}{Khof}&#39;</span> <span class="s">&#39;{Dalet}{Vov}{Reysh}{Khof}&#39;</span> <span class="s">&#39;{Alef}{Hey}{Yud}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Hey}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Alef}{TsveyVovn}{Ayen}{Kuf}&#39;</span> <span class="s">&#39;{Mem}{Yud}{Tes}&#39;</span> <span class="s">&#39;{Alef}{Nun}{Tes}{Kuf}{Ayen}{Giml}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Kuf}{Ayen}{Giml}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Nun}{Yud}{Dalet}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{Alef}{Fey}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{VovYud}{Samekh}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{VovYud}{Fey}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{Vov}{Mem}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{TsveyYudn}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{Vov}{Nun}{Tes}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Alef}{Reysh}{Yud}{Beys}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Nun}{Alef}{Khof}&#39;</span> <span class="s">&#39;{Fey}{Alef}{Reysh}{Beys}{TsveyYudn}&#39;</span> <span class="s">&#39;{Alef}{Hey}{TsveyYudn}{Mem}&#39;</span> <span class="s">&#39;{Alef}{Fey}{Yud}{Reysh}&#39;</span> <span class="s">&#39;{Fey}{Alef}{Reysh}{VovYud}{Samekh}&#39;</span> <span class="s">&#39;{Fey}{Vov}{Nun}{Alef}{Nun}{Dalet}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Tsadek}{Vov}{Zayen}{Alef}{Mem}{Ayen}{Nun}&#39;</span> <span class="s">&#39;{Tsadek}{Vov}{Nun}{VovYud}{Fey}&#39;</span> <span class="s">&#39;{Tsadek}{Vov}{Reysh}{Yud}{Kuf}&#39;</span>
+
+        <span class="c1">// Stressed: Oys-, Oyf-, Um-, Unter-, Iber-, Ayn-, On-, Op-, Bay-, For-, Tsu-.</span>
+        <span class="s">&#39;{Alef}{VovYud}{Samekh}&#39;</span> <span class="s">&#39;{Alef}{VovYud}{Fey}&#39;</span> <span class="s">&#39;{Alef}{Vov}{Mem}&#39;</span> <span class="s">&#39;{Alef}{Vov}{Nun}{Tes}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Alef}{Yud}{Beys}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Alef}{TsveyYudn}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Nun}&#39;</span> <span class="s">&#39;{Alef}{Fey}&#39;</span> <span class="s">&#39;{Beys}{TsveyYudn}&#39;</span> <span class="s">&#39;{Fey}{Alef}{Reysh}&#39;</span> <span class="s">&#39;{Tsadek}{Vov}&#39;</span>
+
+        <span class="c1">// Unstressed:  Ant-, Ba-, Der-, Tse-. Far- already covered by For-. Ge- comes later.</span>
+        <span class="s">&#39;{Alef}{Nun}{Tes}&#39;</span> <span class="s">&#39;{Beys}{Alef}&#39;</span> <span class="s">&#39;{Dalet}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Tsadek}{Ayen}&#39;</span>
+
+        <span class="c1">// If verbal prefix followed by Tsu- or Ge-, replace it</span>
+        <span class="p">(</span>
+
+          <span class="p">((</span><span class="s">&#39;{Tsadek}{Vov}{Giml}{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Tes}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Nun}&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="p">(</span><span class="ow">hop</span> <span class="m">1</span><span class="p">)</span> <span class="ow">hop</span> <span class="o">-</span><span class="m">4</span><span class="p">)</span>
+          <span class="ow">or</span>
+          <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;GE&#39;</span><span class="p">)</span>
+          <span class="ow">or</span>
+          <span class="p">([</span><span class="s">&#39;{Tsadek}{Vov}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;TSU&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="ow">test</span><span class="p">(</span><span class="ow">hop</span> <span class="m">3</span> <span class="ow">setmark</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="c1">// We want to allow three-consonant Hebrew roots.</span>
+    <span class="c1">// To this end, we skip three-consonant combinations that exist in non-Hebraic Yiddish.</span>
+    <span class="ow">try</span> <span class="p">(</span>
+      <span class="k">among</span><span class="p">(</span>
+        <span class="s">&#39;{Shin}{Fey}{Reysh}&#39;</span> <span class="s">&#39;{Shin}{Tes}{Reysh}&#39;</span> <span class="s">&#39;{Shin}{Tes}{Shin}&#39;</span> <span class="s">&#39;{Dalet}{Zayen}{Shin}&#39;</span>
+          <span class="p">(</span> <span class="kc">true</span> <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1">// Either 3 consonants or the first non-vowel after a vowel</span>
+    <span class="p">(</span>
+      <span class="ow">not</span> <span class="p">(</span><span class="n">consonant</span> <span class="n">consonant</span> <span class="n">consonant</span> <span class="ow">setmark</span> <span class="n">p1</span><span class="p">)</span>
+      <span class="ow">goto</span> <span class="n">vowel</span> <span class="ow">repeat</span> <span class="n">vowel</span> <span class="ow">setmark</span> <span class="n">p1</span>
+    <span class="p">)</span>
+    <span class="ow">try</span><span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="n">x</span>  <span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>  <span class="c1">// at least 3 past the prefix</span>
+  <span class="p">)</span>
+
+<span class="p">)</span>
+
+<span class="kd">backwardmode</span> <span class="p">(</span>
+  <span class="kd">define</span> <span class="n">R1</span> <span class="k">as</span> <span class="o">$</span><span class="n">p1</span> <span class="o">&lt;=</span> <span class="ow">cursor</span>
+
+  <span class="kd">define</span> <span class="n">standard_suffix</span> <span class="k">as</span> <span class="p">(</span>
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span><span class="p">(</span>
+        <span class="c1">// Plural/adjective endings: -er, -ers, -e, -n, -s, -en, -ns, -eners, -ens, -es</span>
+         <span class="s">&#39;{Ayen}{Reysh}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Nun}&#39;</span> <span class="s">&#39;{Nun}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}{Reysh}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}&#39;</span> <span class="s">&#39;{Nun}&#39;</span> <span class="s">&#39;{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Mem}&#39;</span> <span class="s">&#39;{Ayen}{Reysh}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Exception: don&#39;t delete noun endings -ie, like &quot;agitatsie&quot;</span>
+        <span class="s">&#39;{Yud}{Ayen}&#39;</span>
+          <span class="p">(</span> <span class="kc">true</span> <span class="p">)</span>
+
+        <span class="c1">// -ies =&gt; ie</span>
+        <span class="s">&#39;{Yud}{Ayen}{Samekh}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span>  <span class="o">&lt;-</span> <span class="s">&#39;{Yud}{Ayen}&#39;</span>  <span class="p">)</span>
+
+        <span class="c1">// Plural/adjective endings: -enem, -ener, -ene, -ens</span>
+        <span class="s">&#39;{Ayen}{Nun}{Ayen}&#39;</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}{Mem}&#39;</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Ayen}{Nun}{Samekh}&#39;</span>
+          <span class="p">(</span><span class="n">R1</span> <span class="ow">delete</span> 
+            <span class="c1">// -gegangen =&gt; -gey</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Giml}{Alef}{Nun}{Giml}&#39;</span> <span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Giml}{TsveyYudn}&#39;</span><span class="p">)</span>
+            <span class="c1">// -genumen =&gt; -nem</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Nun}{Vov}{Mem}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Nun}{Ayen}{Mem}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gemiten =&gt; -mayd</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Mem}{Yud}{Tes}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Mem}{TsveyYudn}{Dalet}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gebiten =&gt; -bayt</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Beys}{Yud}{Tes}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Tes}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gebisen =&gt; -bays</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Beys}{Yud}{Samekh}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gevizen =&gt; -vayz</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{TsveyVovn}{Yud}{Zayen}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyVovn}{TsveyYudn}{Zayen}&#39;</span><span class="p">)</span>
+            <span class="c1">// -getriben =&gt; -trayb</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Tes}{Reysh}{Yud}{Beys}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tes}{Reysh}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geliten =&gt; -layt</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Lamed}{Yud}{Tes}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Lamed}{TsveyYudn}{Tes}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gekliben =&gt; -klayb</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Kuf}{Lamed}{Yud}{Beys}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Kuf}{Lamed}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geriben =&gt; -rayb</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Reysh}{Yud}{Beys}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Reysh}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gerisen =&gt; -rays</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Reysh}{Yud}{Samekh}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Reysh}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geshvigen =&gt; -shvayg</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{TsveyVovn}{Yud}{Giml}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{TsveyVovn}{TsveyYudn}{Giml}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geshmisen =&gt; -shmays</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{Mem}{Yud}{Samekh}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Mem}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geshniten =&gt; -shnayd</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{Nun}{Yud}{Tes}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Nun}{TsveyYudn}{Dalet}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geshriben =&gt; -shrayb</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{Reysh}{Yud}{Beys}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Reysh}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gebunden =&gt; -bind</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Beys}{Vov}{Nun}{Dalet}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Yud}{Nun}{Dalet}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gevuntshn =&gt; -vintsh</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{TsveyVovn}{Vov}{Tes}{Shin}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyVovn}{Yud}{Tes}{Shin}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gezungen =&gt; -zing</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Zayen}{Vov}{Nun}{Giml}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Zayen}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+            <span class="c1">// -getrunken =&gt; -trink</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Tes}{Reysh}{Vov}{Nun}{Kuf}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tes}{Reysh}{Yud}{Nun}{Kuf}&#39;</span><span class="p">)</span>
+            <span class="c1">// -getsvungen =&gt; -tsving</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Tsadek}{TsveyVovn}{Vov}{Nun}{Giml}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tsadek}{TsveyVovn}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geshlungen =&gt; -shling</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{Lamed}{Vov}{Nun}{Giml}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Lamed}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+            <span class="c1">// -geboygen =&gt; -beyg</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Beys}{VovYud}{Giml}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Giml}&#39;</span><span class="p">)</span>
+            <span class="c1">// -gehoyben =&gt; -heyb</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Hey}{VovYud}{Beys}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Hey}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+            <span class="c1">// -farloyren =&gt; -farlir</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Fey}{Alef}{Reysh}{Lamed}{VovYud}{Reysh}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Fey}{Alef}{Reysh}{Lamed}{Yud}{Reysh}&#39;</span><span class="p">)</span>
+            <span class="c1">// -shtanen =&gt; -shtey</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{Tes}{Alef}{Nun}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Tes}{TsveyYudn}&#39;</span><span class="p">)</span>
+             <span class="c1">// -geshvoyrn =&gt; -shver</span>
+            <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Shin}{TsveyVovn}{VovYud}{Reysh}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{TsveyVovn}{Ayen}{Reysh}&#39;</span><span class="p">)</span>
+         <span class="p">)</span>
+
+        <span class="c1">// Verb/past participle ending: -t</span>
+        <span class="s">&#39;{Tes}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span> 
+
+        <span class="c1">// As well as noun/adjectives ending in -tn, -te, -ter, -ts so that the &quot;-t&quot; doesn&#39;t differentiate</span>
+        <span class="c1">// Similarly for past participles: -tns, -tene, -tenem, -tener</span>
+        <span class="c1">// If the Tes was before R1, we try to perform the same action while leaving the Tes in place</span>
+        <span class="s">&#39;{Tes}{Nun}&#39;</span> <span class="s">&#39;{Tes}{Ayen}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Tes}{Samekh}&#39;</span>
+        <span class="s">&#39;{Tes}{Nun}{Samekh}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}{Mem}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}{Reysh}&#39;</span>
+          <span class="p">(</span> <span class="ow">not</span> <span class="p">(</span><span class="n">R1</span> <span class="ow">delete</span>
+              <span class="c1">// -gebrakht =&gt; -breng</span>
+              <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Giml}{Ayen}{Beys}{Reysh}{Alef}{Khof}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Beys}{Reysh}{Alef}{Khof}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Reysh}{Ayen}{Nun}{Giml}&#39;</span><span class="p">)</span>
+              <span class="p">)</span>
+              <span class="ow">repeat</span> <span class="p">(</span><span class="ow">hop</span> <span class="o">-</span><span class="m">1</span><span class="p">)</span>
+              <span class="p">[</span><span class="s">&#39;{Ayen}{Nun}{Ayen}{Reysh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}{Mem}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}&#39;</span> <span class="ow">or</span><span class="s">&#39;{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Reysh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}{Samekh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Samekh}&#39;</span><span class="p">]</span> <span class="n">R1</span> <span class="ow">delete</span><span class="p">)</span> 
+
+        <span class="c1">// -geyn shorted to -gey</span>
+        <span class="s">&#39;{Giml}{TsveyYudn}{Nun}&#39;</span>
+                    <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Giml}{TsveyYudn}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// ##################### Long list of irregular past participles</span>
+        <span class="c1">// -(ge)gangen (shortened to -gangen after prefixes) =&gt; -gey</span>
+        <span class="s">&#39;{Giml}{Alef}{Nun}{Giml}{Ayen}{Nun}&#39;</span>
+                    <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Giml}{TsveyYudn}&#39;</span> <span class="p">)</span>
+
+        <span class="c1">// -(ge)numen (shortened to -numen after prefixes) =&gt; -nem</span>
+        <span class="s">&#39;{Nun}{Vov}{Mem}{Ayen}{Nun}&#39;</span>
+          <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{Nun}{Ayen}{Mem}&#39;</span> <span class="p">)</span>
+
+        <span class="c1">// -(ge)shribn (shortened to -shribn after prefixes) =&gt; -shrayb</span>
+        <span class="s">&#39;{Shin}{Reysh}{Yud}{Beys}{Nun}&#39;</span>
+          <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Reysh}{TsveyYudn}{Beys}&#39;</span> <span class="p">)</span>
+
+        <span class="c1">// -gemiten =&gt; -mayd</span>
+        <span class="s">&#39;GE{Mem}{Yud}{Tes}{Nun}&#39;</span> 
+          <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{Mem}{TsveyYudn}{Dalet}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gebiten =&gt; -bayt</span>
+        <span class="s">&#39;GE{Beys}{Yud}{Tes}{Nun}&#39;</span> 
+          <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Tes}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gebisen =&gt; -bays</span>
+        <span class="s">&#39;GE{Beys}{Yud}{Samekh}{Nun}&#39;</span> 
+          <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gevizen =&gt; -vayz</span>
+        <span class="s">&#39;{TsveyVovn}{Yud}{Zayen}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyVovn}{TsveyYudn}{Zayen}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -getriben =&gt; -trayb</span>
+        <span class="s">&#39;{Tes}{Reysh}{Yud}{Beys}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tes}{Reysh}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geliten =&gt; -layt</span>
+        <span class="s">&#39;GE{Lamed}{Yud}{Tes}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Lamed}{TsveyYudn}{Tes}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gekliben =&gt; -klayb</span>
+        <span class="s">&#39;{Kuf}{Lamed}{Yud}{Beys}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Kuf}{Lamed}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geriben =&gt; -rayb</span>
+        <span class="s">&#39;{Reysh}{Yud}{Beys}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Reysh}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gerisen =&gt; -rays</span>
+        <span class="s">&#39;GE{Reysh}{Yud}{Samekh}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Reysh}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geshvigen =&gt; -shvayg</span>
+        <span class="s">&#39;{Shin}{TsveyVovn}{Yud}{Giml}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{TsveyVovn}{TsveyYudn}{Giml}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geshmisen =&gt; -shmays</span>
+        <span class="s">&#39;{Shin}{Mem}{Yud}{Samekh}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Mem}{TsveyYudn}{Samekh}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geshniten =&gt; -shnayd</span>
+        <span class="s">&#39;{Shin}{Nun}{Yud}{Tes}{Nun}&#39;</span> 
+           <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Nun}{TsveyYudn}{Dalet}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gebunden =&gt; -bind</span>
+        <span class="s">&#39;{Beys}{Vov}{Nun}{Dalet}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Yud}{Nun}{Dalet}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gevuntshn =&gt; -vintsh</span>
+        <span class="s">&#39;{TsveyVovn}{Vov}{Tes}{Shin}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{TsveyVovn}{Yud}{Tes}{Shin}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gezungen =&gt; -zing</span>
+        <span class="s">&#39;{Zayen}{Vov}{Nun}{Giml}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Zayen}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -getrunken =&gt; -trink</span>
+        <span class="s">&#39;{Tes}{Reysh}{Vov}{Nun}{Kuf}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tes}{Reysh}{Yud}{Nun}{Kuf}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -getsvungen =&gt; -tsving</span>
+        <span class="s">&#39;{Tsadek}{TsveyVovn}{Vov}{Nun}{Giml}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tsadek}{TsveyVovn}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geshlungen =&gt; -shling</span>
+        <span class="s">&#39;{Shin}{Lamed}{Vov}{Nun}{Giml}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Lamed}{Yud}{Nun}{Giml}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -geboygen =&gt; -beyg</span>
+        <span class="s">&#39;{Beys}{VovYud}{Giml}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{TsveyYudn}{Giml}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -gehoyben =&gt; -heyb</span>
+        <span class="s">&#39;{Hey}{VovYud}{Beys}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Hey}{TsveyYudn}{Beys}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -farloyren =&gt; -farlir</span>
+        <span class="s">&#39;{Fey}{Alef}{Reysh}{Lamed}{VovYud}{Reysh}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Fey}{Alef}{Reysh}{Lamed}{Yud}{Reysh}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -shtanen =&gt; -shtey</span>
+        <span class="s">&#39;{Shin}{Tes}{Alef}{Nun}{Ayen}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{Tes}{TsveyYudn}&#39;</span><span class="p">)</span>
+
+         <span class="c1">// -geshvoyrn =&gt; -shver</span>
+        <span class="s">&#39;{Shin}{TsveyVovn}{VovYud}{Reysh}{Nun}&#39;</span> 
+         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Shin}{TsveyVovn}{Ayen}{Reysh}&#39;</span><span class="p">)</span>
+
+        <span class="c1">// -(ge)brakht (shortened to -brakht after prefixes) =&gt; -breng</span>
+        <span class="s">&#39;{Beys}{Reysh}{Alef}{Khof}{Tes}&#39;</span>
+          <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Reysh}{Ayen}{Nun}{Giml}&#39;</span> <span class="p">)</span>
+
+        <span class="c1">// ###### End of irregular past participles</span>
+
+        <span class="c1">// Noun endings: -ung, -hayt, -kayt, -ikayt, -shaft</span>
+        <span class="s">&#39;{Vov}{Nun}{Giml}&#39;</span> <span class="s">&#39;{Hey}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Kuf}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Yud}{Kuf}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Shin}{Alef}{Fey}{Tes}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Noun endings: -izm, izmen</span>
+        <span class="s">&#39;{Yud}{Zayen}{Mem}&#39;</span> <span class="s">&#39;{Yud}{Zayen}{Mem}{Ayen}{Nun}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Plural ending: -im</span>
+        <span class="s">&#39;{Yud}{Mem}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+          
+        <span class="c1">// Plural ending: -os (Hebraic), replace with -h</span>
+        <span class="s">&#39;{Vov}{Sof}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span>  <span class="o">&lt;-</span> <span class="s">&#39;{Hey}&#39;</span> <span class="p">)</span>
+
+        <span class="c1">// Diminutive endings: -elekh, -ele, -lekh, -eles, -elen</span>
+        <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Khof}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}&#39;</span> <span class="s">&#39;{Lamed}{Ayen}{Khof}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Nun}&#39;</span>
+           <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+        
+        <span class="c1">// Noun ending: -ist, -istn</span>
+        <span class="s">&#39;{Yud}{Samekh}{Tes}&#39;</span> <span class="s">&#39;{Yud}{Samekh}{Tes}{Nun}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Exceptions to above: -gist, -shist</span>
+        <span class="s">&#39;{Giml}{Yud}{Samekh}{Tes}&#39;</span> <span class="s">&#39;{Shin}{Yud}{Samekh}{Tes}&#39;</span>
+          <span class="p">(</span> <span class="ow">hop</span> <span class="o">-</span><span class="m">4</span> <span class="p">[</span><span class="s">&#39;{Tes}&#39;</span><span class="p">]</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+        
+        <span class="c1">// Verb ending: -stu</span>
+        <span class="s">&#39;{Samekh}{Tes}{Vov}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Superlative ending: -ster, -ste, -stn </span>
+        <span class="s">&#39;{Samekh}{Tes}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Samekh}{Tes}{Ayen}&#39;</span> <span class="s">&#39;{Samekh}{Tes}{Nun}&#39;</span> 
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+          
+        <span class="c1">// Ambiguous verb ending: -st</span>
+        <span class="s">&#39;{Samekh}{Tes}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span> 
+      <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span><span class="p">(</span>
+        <span class="c1">// Noun endings: -ung, -hayt, -kayt, -ikayt, -shaft</span>
+        <span class="s">&#39;{Vov}{Nun}{Giml}&#39;</span> <span class="s">&#39;{Hey}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Kuf}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Yud}{Kuf}{TsveyYudn}{Tes}&#39;</span> <span class="s">&#39;{Shin}{Alef}{Fey}{Tes}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Diminutive endings: -l</span>
+        <span class="s">&#39;{Lamed}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="n">consonant</span> <span class="ow">delete</span> <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="ow">do</span> <span class="p">(</span>
+      <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span><span class="p">(</span>
+        <span class="c1">// Adjective endings: -ig, -ik, -ish, -nik</span>
+        <span class="s">&#39;{Yud}{Giml}&#39;</span> <span class="s">&#39;{Yud}{Kuf}&#39;</span> <span class="s">&#39;{Yud}{Shin}&#39;</span> <span class="s">&#39;{Nun}{Yud}{Kuf}&#39;</span> <span class="s">&#39;{Dalet}{Yud}{Kuf}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Exceptions to above: -blik, -glik</span>
+        <span class="s">&#39;{Beys}{Lamed}{Yud}{Kuf}&#39;</span> <span class="s">&#39;{Giml}{Lamed}{Yud}{Kuf}&#39;</span>
+          <span class="p">(</span> <span class="kc">true</span> <span class="p">)</span>
+          
+        <span class="c1">// Present participle endings: -ndik</span>
+        <span class="s">&#39;{Nun}{Dalet}{Yud}{Kuf}&#39;</span>
+           <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+
+        <span class="c1">// Present participle ending -endik: delete if after a -ng, -nk, -n, -m, consonant+l, or vowel.</span>
+        <span class="c1">// Otherwise, delete just the -ndik part.</span>
+        <span class="s">&#39;{Ayen}{Nun}{Dalet}{Yud}{Kuf}&#39;</span>
+           <span class="p">(</span> <span class="n">R1</span> 
+             <span class="ow">not</span> <span class="p">(</span><span class="ow">test</span><span class="p">(</span><span class="s">&#39;{Nun}{Giml}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}{Kuf}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Mem}&#39;</span> <span class="ow">or</span> <span class="p">(</span><span class="s">&#39;Lamed&#39;</span> <span class="n">consonant</span><span class="p">)</span> <span class="ow">or</span> <span class="n">vowel</span><span class="p">)</span> <span class="ow">delete</span><span class="p">)</span>
+             <span class="ow">hop</span> <span class="o">-</span><span class="m">5</span> <span class="s">&#39;{Nun}{Dalet}{Yud}{Kuf}&#39;</span> <span class="ow">delete</span>
+           <span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="ow">do</span> <span class="p">(</span><span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span> <span class="p">[</span><span class="s">&#39;GE&#39;</span> <span class="ow">or</span> <span class="s">&#39;TSU&#39;</span><span class="p">]</span> <span class="ow">delete</span> <span class="p">))</span>
+  <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="kd">define</span> <span class="n">stem</span> <span class="k">as</span> <span class="p">(</span>
+  <span class="ow">do</span> <span class="n">prelude</span>
+  <span class="ow">do</span> <span class="n">mark_regions</span>
+  <span class="ow">backwards</span>
+    <span class="ow">do</span> <span class="n">standard_suffix</span>
+<span class="p">)</span>
+</pre></div>
+
+
+        </div><!-- /.col-md-10 -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+
+    <div class="container">
+      <footer class="footer">
+        <p>
+          <a href="/lists.html">Write to our mailing list</a> if you have comments or questions about the project.
+        </p>
+      </footer>
+    </div> <!-- /container -->
+    <script src="https://cdn.jsdelivr.net/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>
