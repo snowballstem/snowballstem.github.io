@@ -54,7 +54,6 @@
 
 <ul>
 <li> <A HREF="../compiler/snowman.html">     Snowball manual</A>
-<li> <A HREF="driver.c">     simple driver</A>
 </ul>
 
 <h2>Compiling and running Snowball</h2>
@@ -371,199 +370,10 @@ usually be necessary:
 <p>
 The stemming scripts on this Web site use Snowball very simply.
 <code>-vprefix</code>&nbsp; is left unset, and &nbsp;<code>-eprefix</code>&nbsp; is set to the name of the
-script (usually the language the script is for). All the programs are
-tested through a common <A HREF="driver.c">driver</A> program.
+script (usually the language the script is for).
 </p>
 
-<h2>Getting started</h2>
-
-<p>
-The complete apparatus of the libstemmer download plus the make files can
-obscure the essential simplicity of the Snowball system. Just to get a bit of
-confidence in using it, here is something you can try safely at home.
-</p>
-
-<p>
-First, install the compiler, as documented above.
-</p>
-
-<p>
-Then copy the files &nbsp;<code>hungarian.sbl</code>, &nbsp;<code>voc.txt</code>&nbsp; and &nbsp;<code>output.txt</code>&nbsp; from the <a href="/algorithms/hungarian/stemmer.html">page for the Hungarian stemmer</a> to the same directory.
-Take the &nbsp;<code>runtime/</code>&nbsp; directory out of the snowball code download, and put it in
-the current directory, renamed as &nbsp;<code>q/</code>, say.
-</p>
-
-<p>
-<code>q/</code>&nbsp; contains four files, &nbsp;<code>api.c</code>, &nbsp;<code>api.h</code>, &nbsp;<code>header.h</code>, &nbsp;<code>utilities.c</code>. Now compile the
-snowball script,
-</p>
-
-<PRE>
-    snowball hungarian.sbl -o q/hungarian -ep H_ -utf8
-</PRE>
-
-<p>
-(Note the &nbsp;<code>-utf8</code>&nbsp; option.) This put two more files into &nbsp;<code>q/</code>, &nbsp;<code>hungarian.c</code>&nbsp; and
-<code>hungarian.h</code>. Next put into &nbsp;<code>q/</code>&nbsp; a driver program. You can download it from the link
-at the top of this page, but here it is,
-</p>
-
-<div class="highlight"><pre>    <span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-    <span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt; /* for malloc, free */</span><span class="cp"></span>
-    <span class="cp">#include</span> <span class="cpf">&lt;string.h&gt; /* for memmove */</span><span class="cp"></span>
-
-    <span class="cp">#include</span> <span class="cpf">&quot;api.h&quot;</span><span class="cp"></span>
-    <span class="cp">#include</span> <span class="cpf">&quot;hungarian.h&quot;</span><span class="cp"></span>
-
-
-    <span class="cm">/* This derives from the source file driver.template */</span>
-
-    <span class="cm">/* A simple driver for a single ANSI C generated Hungarian stemmer.</span>
-
-<span class="cm">       Following compilation with</span>
-
-<span class="cm">           gcc -o H_prog q/*.c</span>
-
-<span class="cm">       The command line syntax is</span>
-
-<span class="cm">           ./H_prog [file] [-o[utput] file] [-h[elp]]</span>
-
-<span class="cm">       The first argument gives the input file, which consists of a list of words</span>
-<span class="cm">       to be stemmed, one per line. (Words must be in lower case.) If omitted, stdin</span>
-<span class="cm">       is used.</span>
-
-<span class="cm">       The output is sent to stdout by default, otherwise to the -output file.</span>
-
-<span class="cm">    */</span>
-
-    <span class="k">static</span> <span class="kt">void</span> <span class="nf">stem_file</span><span class="p">(</span><span class="k">struct</span> <span class="n">SN_env</span> <span class="o">*</span> <span class="n">z</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span> <span class="n">f_in</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span> <span class="n">f_out</span><span class="p">)</span> <span class="p">{</span>
-    <span class="cp">#define INC 10</span>
-        <span class="kt">int</span> <span class="n">lim</span> <span class="o">=</span> <span class="n">INC</span><span class="p">;</span>
-        <span class="n">symbol</span> <span class="o">*</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">symbol</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">lim</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">symbol</span><span class="p">));</span>
-
-        <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kt">int</span> <span class="n">ch</span> <span class="o">=</span> <span class="n">getc</span><span class="p">(</span><span class="n">f_in</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">free</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="k">return</span><span class="p">;</span>
-            <span class="p">}</span>
-            <span class="p">{</span>
-                <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-                <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">ch</span> <span class="o">==</span> <span class="sc">&#39;\n&#39;</span> <span class="o">||</span> <span class="n">ch</span> <span class="o">==</span> <span class="n">EOF</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">lim</span><span class="p">)</span> <span class="p">{</span>  <span class="cm">/* make b bigger */</span>
-                        <span class="n">symbol</span> <span class="o">*</span> <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">symbol</span> <span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">((</span><span class="n">lim</span> <span class="o">+</span> <span class="n">INC</span><span class="p">)</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">symbol</span><span class="p">));</span>
-                        <span class="n">memmove</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">lim</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">symbol</span><span class="p">));</span>
-                        <span class="n">free</span><span class="p">(</span><span class="n">b</span><span class="p">);</span> <span class="n">b</span> <span class="o">=</span> <span class="n">q</span><span class="p">;</span>
-                        <span class="n">lim</span> <span class="o">=</span> <span class="n">lim</span> <span class="o">+</span> <span class="n">INC</span><span class="p">;</span>
-                    <span class="p">}</span>
-                    <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ch</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-                    <span class="n">ch</span> <span class="o">=</span> <span class="n">getc</span><span class="p">(</span><span class="n">f_in</span><span class="p">);</span>
-                <span class="p">}</span>
-
-                <span class="n">SN_set_current</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
-                <span class="n">H_stem</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
-                <span class="p">{</span>
-                    <span class="kt">int</span> <span class="n">j</span><span class="p">;</span>
-                    <span class="k">for</span> <span class="p">(</span><span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">l</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="n">fprintf</span><span class="p">(</span><span class="n">f_out</span><span class="p">,</span> <span class="s">&quot;%c&quot;</span><span class="p">,</span> <span class="n">z</span><span class="o">-&gt;</span><span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">]);</span>
-                    <span class="n">fprintf</span><span class="p">(</span><span class="n">f_out</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">static</span> <span class="kt">int</span> <span class="nf">eq</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span> <span class="n">s1</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">s2</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kt">int</span> <span class="n">s1_len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">s1</span><span class="p">);</span>
-        <span class="kt">int</span> <span class="n">s2_len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">s2</span><span class="p">);</span>
-        <span class="k">return</span> <span class="n">s1_len</span> <span class="o">==</span> <span class="n">s2_len</span> <span class="o">&amp;&amp;</span> <span class="n">memcmp</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s1_len</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">static</span> <span class="kt">void</span> <span class="nf">show_options</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;options are: file [-o[utput] file] [-h[elp]]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-        <span class="n">exit</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
-    <span class="p">{</span>   <span class="kt">char</span> <span class="o">*</span> <span class="n">in</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="kt">char</span> <span class="o">*</span> <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="p">{</span>   <span class="kt">char</span> <span class="o">*</span> <span class="n">s</span><span class="p">;</span>
-            <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-            <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">argc</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">];</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;-&#39;</span><span class="p">)</span> <span class="p">{</span>
-
-                    <span class="k">if</span> <span class="p">(</span><span class="n">eq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;-output&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="n">eq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;-o&quot;</span><span class="p">))</span> <span class="p">{</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">argc</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;%s requires an argument</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
-                            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-                        <span class="p">}</span>
-                        <span class="n">out</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">];</span>
-                    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">eq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;-help&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="n">eq</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;-h&quot;</span><span class="p">))</span> <span class="p">{</span>
-                        <span class="n">show_options</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-                    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;%s unknown</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
-                        <span class="n">show_options</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-                    <span class="p">}</span>
-                <span class="p">}</span>
-                <span class="k">else</span> <span class="n">in</span> <span class="o">=</span> <span class="n">s</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-
-        <span class="cm">/* initialise the stemming process: */</span>
-
-        <span class="p">{</span>
-            <span class="k">struct</span> <span class="n">SN_env</span> <span class="o">*</span> <span class="n">z</span> <span class="o">=</span> <span class="n">H_create_env</span><span class="p">();</span>
-            <span class="kt">FILE</span> <span class="o">*</span> <span class="n">f_in</span><span class="p">;</span>
-            <span class="kt">FILE</span> <span class="o">*</span> <span class="n">f_out</span><span class="p">;</span>
-            <span class="n">f_in</span> <span class="o">=</span> <span class="n">in</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="nl">stdin</span> <span class="p">:</span> <span class="n">fopen</span><span class="p">(</span><span class="n">in</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">f_in</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;file %s not found</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in</span><span class="p">);</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="n">f_out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">?</span> <span class="nl">stdout</span> <span class="p">:</span> <span class="n">fopen</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">f_out</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;file %s cannot be opened</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">out</span><span class="p">);</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="n">stem_file</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">f_in</span><span class="p">,</span> <span class="n">f_out</span><span class="p">);</span>
-            <span class="n">H_close_env</span><span class="p">(</span><span class="n">z</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-</pre></div>
-</PRE>
-
-<p>
-Now compile the &nbsp;<code>q/</code>&nbsp; sources to the Hungarian stemmer program &nbsp;<code>H_prog</code>,
-</p>
-
-<PRE>
-    gcc -o H_prog q/*.c
-</PRE>
-
-<p>
-And &nbsp;<code>H_prog</code>&nbsp; will turn the vocabulary into the stemmed output, as you can check by
-doing,
-</p>
-
-<PRE>
-    ./H_prog voc.txt -o TEMP.txt
-    diff output.txt TEMP.txt
-</PRE>
-
-<p>
-In summary therefore,
-</p>
-
-<PRE>
-    snowball hungarian.sbl -o q/hungarian -ep H_ -utf8
-    gcc -o H_prog q/*.c
-    ./H_prog voc.txt -o TEMP.txt
-    diff output.txt TEMP.txt
-</PRE>
-
-<p>
-(Not so hard.)
-</p>
+<!-- We should probably reinstate this section: <h2>Getting started</h2> -->
 
 <h2>Debugging snowball scripts</h2>
 
@@ -587,8 +397,10 @@ At present there is no way of reporting the value of an integer or boolean.
 </p>
 
 <p>
-If desperate, you can put debugging lines into the generated C program. This is not so
-hard, since running comments show the correspondence with the Snowball source.
+If desperate, you can put debugging lines into the generated C program.
+You can pass <code>-comments</code> to the snowball compiler to get it to
+generate comments showing the correspondence with the Snowball source which
+makes it easier to find where to add such debugging code.
 </p>
 
 <h2>Compiler bugs</h2>

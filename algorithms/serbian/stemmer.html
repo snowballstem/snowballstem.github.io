@@ -442,7 +442,7 @@ couldn't be stemmed using the rules from the first step.
     <span class="n">cyr_to_lat</span>
     <span class="n">prelude</span>
     <span class="n">mark_regions</span>
-    <span class="n">R1</span> <span class="n">R2</span>
+    <span class="n">R1</span>
     <span class="n">Step_1</span>
     <span class="n">Step_2</span>
     <span class="n">Step_3</span>
@@ -450,7 +450,9 @@ couldn't be stemmed using the rules from the first step.
 
 <span class="kd">externals</span> <span class="p">(</span> <span class="n">stem</span> <span class="p">)</span>
 
-<span class="kd">integers</span> <span class="p">(</span> <span class="n">p1</span> <span class="n">p2</span> <span class="n">p3</span> <span class="p">)</span>
+<span class="kd">booleans</span> <span class="p">(</span> <span class="n">no_diacritics</span> <span class="p">)</span>
+
+<span class="kd">integers</span> <span class="p">(</span> <span class="n">p1</span> <span class="p">)</span>
 
 <span class="kd">groupings</span> <span class="p">(</span> <span class="n">v</span> <span class="n">ca</span> <span class="n">sa</span> <span class="n">rg</span> <span class="p">)</span>
 
@@ -499,14 +501,14 @@ couldn't be stemmed using the rules from the first step.
 <span class="kd">stringdef</span> <span class="n">sx</span>    <span class="s">&#39;{U+0161}&#39;</span> <span class="c1">// small s with caron</span>
 <span class="kd">stringdef</span> <span class="n">dx</span>    <span class="s">&#39;{U+0111}&#39;</span> <span class="c1">// small d with stroke</span>
 
-<span class="kd">define</span> <span class="n">v</span> <span class="s">&#39;aeiou&#39;</span> 
+<span class="kd">define</span> <span class="n">v</span> <span class="s">&#39;aeiou&#39;</span>
 <span class="kd">define</span> <span class="n">sa</span> <span class="s">&#39;{cx}{cy}{zx}{sx}{dx}&#39;</span>
 <span class="kd">define</span> <span class="n">ca</span> <span class="s">&#39;bvgdzjklmnprstfhc&#39;</span> <span class="o">+</span> <span class="n">sa</span>
 <span class="kd">define</span> <span class="n">rg</span> <span class="s">&#39;r&#39;</span>
 
 
 <span class="kd">define</span> <span class="n">cyr_to_lat</span> <span class="k">as</span> <span class="p">(</span>
-    
+
     <span class="ow">do</span> <span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span>
         <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;{cyrA}&#39;</span>    <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;a&#39;</span><span class="p">)</span>
@@ -541,54 +543,53 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;{cyrSx}&#39;</span>   <span class="p">(</span><span class="o">&lt;-</span> <span class="s">&#39;{sx}&#39;</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">)</span>
-        
+
 <span class="p">)</span>
 
 <span class="kd">define</span> <span class="n">prelude</span> <span class="k">as</span> <span class="p">(</span>
 
     <span class="ow">do</span> <span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span>
-        <span class="n">ca</span> <span class="p">[</span><span class="s">&#39;ije&#39;</span><span class="p">]</span> <span class="n">ca</span> <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span> 
+        <span class="n">ca</span> <span class="p">[</span><span class="s">&#39;ije&#39;</span><span class="p">]</span> <span class="n">ca</span> <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
     <span class="p">)</span>
 
     <span class="ow">do</span> <span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span>
-        <span class="n">ca</span> <span class="p">[</span><span class="s">&#39;je&#39;</span><span class="p">]</span> <span class="n">ca</span> <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span> 
+        <span class="n">ca</span> <span class="p">[</span><span class="s">&#39;je&#39;</span><span class="p">]</span> <span class="n">ca</span> <span class="o">&lt;-</span> <span class="s">&#39;e&#39;</span>
     <span class="p">)</span>
-        
+
     <span class="ow">do</span> <span class="ow">repeat</span> <span class="ow">goto</span> <span class="p">(</span>
-        <span class="p">[</span><span class="s">&#39;dj&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{dx}&#39;</span> 
+        <span class="p">[</span><span class="s">&#39;dj&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{dx}&#39;</span>
     <span class="p">)</span>
-        
+
 <span class="p">)</span>
 
 <span class="kd">define</span> <span class="n">mark_regions</span> <span class="k">as</span> <span class="p">(</span>
 
-    <span class="o">$</span><span class="n">p3</span> <span class="o">=</span> <span class="m">0</span>
-    
+    <span class="ow">set</span> <span class="n">no_diacritics</span>
+
     <span class="ow">do</span> <span class="p">(</span>
-        <span class="ow">gopast</span> <span class="n">sa</span> <span class="ow">setmark</span> <span class="n">p3</span>
+        <span class="ow">gopast</span> <span class="n">sa</span> <span class="ow">unset</span> <span class="n">no_diacritics</span>
     <span class="p">)</span>
-    
+
     <span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="ow">limit</span>
-    <span class="o">$</span><span class="n">p2</span> <span class="o">=</span> <span class="m">0</span>
-    
+
     <span class="ow">do</span> <span class="p">(</span>
         <span class="ow">gopast</span> <span class="n">v</span> <span class="ow">setmark</span> <span class="n">p1</span>
+        <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="m">2</span><span class="p">)</span> <span class="p">(</span>
+            <span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span>
+            <span class="ow">setmark</span> <span class="n">p1</span>
+        <span class="p">)</span>
     <span class="p">)</span>
     <span class="ow">do</span> <span class="p">(</span>
-        <span class="ow">gopast</span> <span class="s">&#39;r&#39;</span> <span class="ow">setmark</span> <span class="n">p2</span>
-        <span class="o">$</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">=</span> <span class="n">p2</span><span class="p">)</span>
+        <span class="ow">gopast</span> <span class="s">&#39;r&#39;</span>
+        <span class="o">$</span><span class="p">(</span><span class="ow">cursor</span> <span class="o">&gt;=</span> <span class="m">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">gopast</span> <span class="ow">non-</span><span class="n">rg</span><span class="p">)</span>
+        <span class="o">$</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="ow">cursor</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="ow">setmark</span> <span class="n">p1</span>
     <span class="p">)</span>
-    <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">&lt;</span> <span class="m">2</span><span class="p">)</span> <span class="p">(</span>
-        <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">==</span> <span class="n">p2</span> <span class="ow">gopast</span> <span class="s">&#39;r&#39;</span> <span class="ow">gopast</span> <span class="ow">non-</span><span class="n">rg</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="o">$</span><span class="n">p1</span> <span class="o">!=</span> <span class="n">p2</span> <span class="ow">gopast</span> <span class="n">v</span> <span class="ow">gopast</span> <span class="ow">non-</span><span class="n">v</span><span class="p">)</span>
-        <span class="ow">setmark</span> <span class="n">p1</span>
-    <span class="p">)</span>
-    
+
 <span class="p">)</span>
 
 <span class="kd">backwardmode</span> <span class="p">(</span>
 
     <span class="kd">define</span> <span class="n">R1</span> <span class="k">as</span> <span class="o">$</span><span class="n">p1</span> <span class="o">&lt;=</span> <span class="ow">cursor</span>
-    <span class="kd">define</span> <span class="n">R2</span> <span class="k">as</span> <span class="o">$</span><span class="n">p3</span> <span class="o">==</span> <span class="m">0</span>
 
     <span class="kd">define</span> <span class="n">Step_1</span> <span class="k">as</span> <span class="p">(</span>
         <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span> <span class="p">(</span>
@@ -601,7 +602,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;jaci&#39;</span>
             <span class="s">&#39;jacima&#39;</span>        <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;jak&#39;</span><span class="p">)</span>
             <span class="s">&#39;{cx}ajan&#39;</span>      <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;{cx}ajni&#39;</span><span class="p">)</span>
-            <span class="s">&#39;cajan&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;cajni&#39;</span><span class="p">)</span>
+            <span class="s">&#39;cajan&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;cajni&#39;</span><span class="p">)</span>
             <span class="s">&#39;eran&#39;</span>          <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;erni&#39;</span><span class="p">)</span>
             <span class="s">&#39;laran&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;larni&#39;</span><span class="p">)</span>
             <span class="s">&#39;esan&#39;</span>          <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;esni&#39;</span><span class="p">)</span>
@@ -632,7 +633,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;kusan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;kusni&#39;</span><span class="p">)</span>
             <span class="s">&#39;kustava&#39;</span>       <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;kustva&#39;</span><span class="p">)</span>
             <span class="s">&#39;du{sx}an&#39;</span>      <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;du{sx}ni&#39;</span><span class="p">)</span>
-            <span class="s">&#39;dusan&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;dusni&#39;</span><span class="p">)</span>
+            <span class="s">&#39;dusan&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;dusni&#39;</span><span class="p">)</span>
             <span class="s">&#39;antan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;antni&#39;</span><span class="p">)</span>
             <span class="s">&#39;bilan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;bilni&#39;</span><span class="p">)</span>
             <span class="s">&#39;tilan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;tilni&#39;</span><span class="p">)</span>
@@ -653,14 +654,14 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;tetan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;tetni&#39;</span><span class="p">)</span>
             <span class="s">&#39;pletan&#39;</span>        <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;pletni&#39;</span><span class="p">)</span>
             <span class="s">&#39;{sx}ave&#39;</span>       <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;{sx}avi&#39;</span><span class="p">)</span>
-            <span class="s">&#39;save&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;savi&#39;</span><span class="p">)</span>
+            <span class="s">&#39;save&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;savi&#39;</span><span class="p">)</span>
             <span class="s">&#39;anata&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;anta&#39;</span><span class="p">)</span>
             <span class="s">&#39;a{cx}ak&#39;</span>
             <span class="s">&#39;a{cx}aka&#39;</span>      <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;a{cx}ka&#39;</span><span class="p">)</span>
             <span class="s">&#39;acak&#39;</span>
-            <span class="s">&#39;acaka&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;acka&#39;</span><span class="p">)</span>
+            <span class="s">&#39;acaka&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;acka&#39;</span><span class="p">)</span>
             <span class="s">&#39;u{sx}ak&#39;</span>       <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;u{sx}ka&#39;</span><span class="p">)</span>
-            <span class="s">&#39;usak&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;uska&#39;</span><span class="p">)</span>
+            <span class="s">&#39;usak&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;uska&#39;</span><span class="p">)</span>
             <span class="s">&#39;atak&#39;</span>
             <span class="s">&#39;ataka&#39;</span>
             <span class="s">&#39;atci&#39;</span>
@@ -678,7 +679,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;utcima&#39;</span>        <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;utka&#39;</span><span class="p">)</span>
             <span class="s">&#39;eskan&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;eskna&#39;</span><span class="p">)</span>
             <span class="s">&#39;ti{cx}an&#39;</span>      <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;ti{cx}ni&#39;</span><span class="p">)</span>
-            <span class="s">&#39;tican&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ticni&#39;</span><span class="p">)</span>
+            <span class="s">&#39;tican&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ticni&#39;</span><span class="p">)</span>
             <span class="s">&#39;ojsci&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;ojska&#39;</span><span class="p">)</span>
             <span class="s">&#39;esama&#39;</span>         <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;esma&#39;</span><span class="p">)</span>
             <span class="s">&#39;metar&#39;</span>
@@ -688,7 +689,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;istar&#39;</span>
             <span class="s">&#39;istara&#39;</span>        <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;istra&#39;</span><span class="p">)</span>
             <span class="s">&#39;o{sx}{cy}u&#39;</span>    <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;osti&#39;</span><span class="p">)</span>
-            <span class="s">&#39;oscu&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;osti&#39;</span><span class="p">)</span>
+            <span class="s">&#39;oscu&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;osti&#39;</span><span class="p">)</span>
             <span class="s">&#39;daba&#39;</span>          <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;dba&#39;</span><span class="p">)</span>
             <span class="s">&#39;{cx}cima&#39;</span>
             <span class="s">&#39;{cx}ci&#39;</span>        <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;{cx}ka&#39;</span><span class="p">)</span>
@@ -721,10 +722,10 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;jebe&#39;</span>          <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;jebi&#39;</span><span class="p">)</span>
             <span class="s">&#39;baci&#39;</span>          <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;baci&#39;</span><span class="p">)</span>
             <span class="s">&#39;a{sx}an&#39;</span>       <span class="p">(</span><span class="o">&lt;-</span><span class="s">&#39;a{sx}ni&#39;</span><span class="p">)</span>
-            <span class="s">&#39;asan&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;asni&#39;</span><span class="p">)</span>
+            <span class="s">&#39;asan&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;asni&#39;</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">)</span>
-	
+
     <span class="kd">define</span> <span class="n">Step_2</span> <span class="k">as</span> <span class="p">(</span>
         <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="n">R1</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;skijima&#39;</span>
@@ -2443,7 +2444,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;lucuj&#39;</span>
             <span class="s">&#39;lucen&#39;</span>
             <span class="s">&#39;luce&#39;</span>
-            <span class="s">&#39;luci&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;luc&#39;</span><span class="p">)</span>
+            <span class="s">&#39;luci&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;luc&#39;</span><span class="p">)</span>
             <span class="s">&#39;snjijima&#39;</span>
             <span class="s">&#39;snjijemu&#39;</span>
             <span class="s">&#39;snjijega&#39;</span>
@@ -2472,7 +2473,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;snje&#39;</span>
             <span class="s">&#39;snji&#39;</span>
             <span class="s">&#39;snjo&#39;</span>
-            <span class="s">&#39;snju&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;snj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;snju&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;snj&#39;</span><span class="p">)</span>
             <span class="s">&#39;osijima&#39;</span>
             <span class="s">&#39;osijemu&#39;</span>
             <span class="s">&#39;osijega&#39;</span>
@@ -2502,7 +2503,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;osa&#39;</span>
             <span class="s">&#39;ose&#39;</span>
             <span class="s">&#39;osi&#39;</span>
-            <span class="s">&#39;osu&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;os&#39;</span><span class="p">)</span>
+            <span class="s">&#39;osu&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;os&#39;</span><span class="p">)</span>
             <span class="s">&#39;acismo&#39;</span>
             <span class="s">&#39;aciste&#39;</span>
             <span class="s">&#39;acima&#39;</span>
@@ -2538,7 +2539,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;acis&#39;</span>
             <span class="s">&#39;ace&#39;</span>
             <span class="s">&#39;aca&#39;</span>
-            <span class="s">&#39;aci&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ac&#39;</span><span class="p">)</span>
+            <span class="s">&#39;aci&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ac&#39;</span><span class="p">)</span>
             <span class="s">&#39;ecome&#39;</span>
             <span class="s">&#39;ecoga&#39;</span>
             <span class="s">&#39;ecemu&#39;</span>
@@ -2554,7 +2555,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;ecem&#39;</span>
             <span class="s">&#39;ecim&#39;</span>
             <span class="s">&#39;eca&#39;</span>
-            <span class="s">&#39;ece&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ec&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ece&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ec&#39;</span><span class="p">)</span>
             <span class="s">&#39;ucomu&#39;</span>
             <span class="s">&#39;ucome&#39;</span>
             <span class="s">&#39;ucima&#39;</span>
@@ -2570,7 +2571,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;ucuh&#39;</span>
             <span class="s">&#39;ucoj&#39;</span>
             <span class="s">&#39;uca&#39;</span>
-            <span class="s">&#39;uce&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;uc&#39;</span><span class="p">)</span>
+            <span class="s">&#39;uce&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;uc&#39;</span><span class="p">)</span>
             <span class="s">&#39;rosismo&#39;</span>
             <span class="s">&#39;rosivsi&#39;</span>
             <span class="s">&#39;rosiste&#39;</span>
@@ -2586,7 +2587,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;rosis&#39;</span>
             <span class="s">&#39;rosio&#39;</span>
             <span class="s">&#39;rosim&#39;</span>
-            <span class="s">&#39;rosih&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;rosi&#39;</span><span class="p">)</span>
+            <span class="s">&#39;rosih&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;rosi&#39;</span><span class="p">)</span>
             <span class="s">&#39;acavsi&#39;</span>
             <span class="s">&#39;acaste&#39;</span>
             <span class="s">&#39;acasmo&#39;</span>
@@ -2609,7 +2610,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;acao&#39;</span>
             <span class="s">&#39;acas&#39;</span>
             <span class="s">&#39;acat&#39;</span>
-            <span class="s">&#39;acah&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;aca&#39;</span><span class="p">)</span>
+            <span class="s">&#39;acah&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;aca&#39;</span><span class="p">)</span>
             <span class="s">&#39;jasima&#39;</span>
             <span class="s">&#39;jasama&#39;</span>
             <span class="s">&#39;jasem&#39;</span>
@@ -2617,7 +2618,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;jase&#39;</span>
             <span class="s">&#39;jasi&#39;</span>
             <span class="s">&#39;jasa&#39;</span>
-            <span class="s">&#39;jasu&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;jas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;jasu&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;jas&#39;</span><span class="p">)</span>
             <span class="s">&#39;tasima&#39;</span>
             <span class="s">&#39;tasama&#39;</span>
             <span class="s">&#39;tasem&#39;</span>
@@ -2625,7 +2626,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;tase&#39;</span>
             <span class="s">&#39;tasa&#39;</span>
             <span class="s">&#39;tasu&#39;</span>
-            <span class="s">&#39;tasi&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;tas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;tasi&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;tas&#39;</span><span class="p">)</span>
             <span class="s">&#39;gasima&#39;</span>
             <span class="s">&#39;gasama&#39;</span>
             <span class="s">&#39;gasem&#39;</span>
@@ -2633,7 +2634,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;gasi&#39;</span>
             <span class="s">&#39;gasu&#39;</span>
             <span class="s">&#39;gase&#39;</span>
-            <span class="s">&#39;gasa&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;gas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;gasa&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;gas&#39;</span><span class="p">)</span>
             <span class="s">&#39;nasama&#39;</span>
             <span class="s">&#39;nasima&#39;</span>
             <span class="s">&#39;nasem&#39;</span>
@@ -2641,7 +2642,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;nasu&#39;</span>
             <span class="s">&#39;nasi&#39;</span>
             <span class="s">&#39;nase&#39;</span>
-            <span class="s">&#39;nasa&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;nas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;nasa&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;nas&#39;</span><span class="p">)</span>
             <span class="s">&#39;kasama&#39;</span>
             <span class="s">&#39;kasima&#39;</span>
             <span class="s">&#39;kasom&#39;</span>
@@ -2649,7 +2650,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;kasi&#39;</span>
             <span class="s">&#39;kasu&#39;</span>
             <span class="s">&#39;kase&#39;</span>
-            <span class="s">&#39;kasa&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;kas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;kasa&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;kas&#39;</span><span class="p">)</span>
             <span class="s">&#39;vasama&#39;</span>
             <span class="s">&#39;vasima&#39;</span>
             <span class="s">&#39;vasom&#39;</span>
@@ -2657,7 +2658,7 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;vasi&#39;</span>
             <span class="s">&#39;vase&#39;</span>
             <span class="s">&#39;vasa&#39;</span>
-            <span class="s">&#39;vasu&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;vas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;vasu&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;vas&#39;</span><span class="p">)</span>
             <span class="s">&#39;basama&#39;</span>
             <span class="s">&#39;basima&#39;</span>
             <span class="s">&#39;basom&#39;</span>
@@ -2665,9 +2666,9 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;basi&#39;</span>
             <span class="s">&#39;base&#39;</span>
             <span class="s">&#39;basu&#39;</span>
-            <span class="s">&#39;basa&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;bas&#39;</span><span class="p">)</span>
+            <span class="s">&#39;basa&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;bas&#39;</span><span class="p">)</span>
             <span class="s">&#39;astuci&#39;</span>
-            <span class="s">&#39;astes&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;as&#39;</span><span class="p">)</span>
+            <span class="s">&#39;astes&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;as&#39;</span><span class="p">)</span>
             <span class="s">&#39;cinima&#39;</span>
             <span class="s">&#39;cinome&#39;</span>
             <span class="s">&#39;cinama&#39;</span>
@@ -2682,89 +2683,89 @@ couldn't be stemmed using the rules from the first step.
             <span class="s">&#39;cini&#39;</span>
             <span class="s">&#39;cinu&#39;</span>
             <span class="s">&#39;cine&#39;</span>
-            <span class="s">&#39;cina&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;cin&#39;</span><span class="p">)</span>
+            <span class="s">&#39;cina&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;cin&#39;</span><span class="p">)</span>
             <span class="s">&#39;astajase&#39;</span>
             <span class="s">&#39;astajuci&#39;</span>
-            <span class="s">&#39;astajes&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;astaj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;astajes&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;astaj&#39;</span><span class="p">)</span>
             <span class="s">&#39;istajase&#39;</span>
             <span class="s">&#39;istajuci&#39;</span>
-            <span class="s">&#39;istajes&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;istaj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;istajes&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;istaj&#39;</span><span class="p">)</span>
             <span class="s">&#39;ostajase&#39;</span>
             <span class="s">&#39;ostajuci&#39;</span>
-            <span class="s">&#39;ostajes&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ostaj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ostajes&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ostaj&#39;</span><span class="p">)</span>
             <span class="s">&#39;astadose&#39;</span>
             <span class="s">&#39;astades&#39;</span>
             <span class="s">&#39;astanes&#39;</span>
-            <span class="s">&#39;astavsi&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;asta&#39;</span><span class="p">)</span>
+            <span class="s">&#39;astavsi&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;asta&#39;</span><span class="p">)</span>
             <span class="s">&#39;istadose&#39;</span>
             <span class="s">&#39;istades&#39;</span>
             <span class="s">&#39;istanes&#39;</span>
-            <span class="s">&#39;istavsi&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ista&#39;</span><span class="p">)</span>
+            <span class="s">&#39;istavsi&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ista&#39;</span><span class="p">)</span>
             <span class="s">&#39;ostadose&#39;</span>
             <span class="s">&#39;ostades&#39;</span>
             <span class="s">&#39;ostanes&#39;</span>
-            <span class="s">&#39;ostavsi&#39;</span>       <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;osta&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ostavsi&#39;</span>       <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;osta&#39;</span><span class="p">)</span>
             <span class="s">&#39;avajuci&#39;</span>
             <span class="s">&#39;avase&#39;</span>
-            <span class="s">&#39;avas&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ava&#39;</span><span class="p">)</span>
+            <span class="s">&#39;avas&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ava&#39;</span><span class="p">)</span>
             <span class="s">&#39;evajuci&#39;</span>
             <span class="s">&#39;evase&#39;</span>
-            <span class="s">&#39;evas&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;eva&#39;</span><span class="p">)</span>
+            <span class="s">&#39;evas&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;eva&#39;</span><span class="p">)</span>
             <span class="s">&#39;ivajuci&#39;</span>
             <span class="s">&#39;ivase&#39;</span>
-            <span class="s">&#39;ivas&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;iva&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ivas&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;iva&#39;</span><span class="p">)</span>
             <span class="s">&#39;uvajuci&#39;</span>
             <span class="s">&#39;uvase&#39;</span>
-            <span class="s">&#39;uvas&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;uva&#39;</span><span class="p">)</span>
-            <span class="s">&#39;ovase&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ova&#39;</span><span class="p">)</span>
+            <span class="s">&#39;uvas&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;uva&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ovase&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ova&#39;</span><span class="p">)</span>
             <span class="s">&#39;jetise&#39;</span>
-            <span class="s">&#39;jetis&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;jeti&#39;</span><span class="p">)</span>
+            <span class="s">&#39;jetis&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;jeti&#39;</span><span class="p">)</span>
             <span class="s">&#39;injase&#39;</span>
-            <span class="s">&#39;injes&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;inj&#39;</span><span class="p">)</span>
-            <span class="s">&#39;istem&#39;</span>         <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ist&#39;</span><span class="p">)</span>
+            <span class="s">&#39;injes&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;inj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;istem&#39;</span>         <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ist&#39;</span><span class="p">)</span>
             <span class="s">&#39;esama&#39;</span>
             <span class="s">&#39;esem&#39;</span>
-            <span class="s">&#39;esi&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;es&#39;</span><span class="p">)</span>
+            <span class="s">&#39;esi&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;es&#39;</span><span class="p">)</span>
             <span class="s">&#39;etavsi&#39;</span>
             <span class="s">&#39;etuci&#39;</span>
-            <span class="s">&#39;etes&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;et&#39;</span><span class="p">)</span>
+            <span class="s">&#39;etes&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;et&#39;</span><span class="p">)</span>
             <span class="s">&#39;isama&#39;</span>
             <span class="s">&#39;isem&#39;</span>
-            <span class="s">&#39;isi&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;is&#39;</span><span class="p">)</span>
+            <span class="s">&#39;isi&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;is&#39;</span><span class="p">)</span>
             <span class="s">&#39;irajuci&#39;</span>
             <span class="s">&#39;irujuci&#39;</span>
             <span class="s">&#39;irujes&#39;</span>
             <span class="s">&#39;iravsi&#39;</span>
             <span class="s">&#39;irase&#39;</span>
-            <span class="s">&#39;iras&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ir&#39;</span><span class="p">)</span>
+            <span class="s">&#39;iras&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ir&#39;</span><span class="p">)</span>
             <span class="s">&#39;urajuci&#39;</span>
             <span class="s">&#39;urase&#39;</span>
-            <span class="s">&#39;uras&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ur&#39;</span><span class="p">)</span>
+            <span class="s">&#39;uras&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ur&#39;</span><span class="p">)</span>
             <span class="s">&#39;ujuci&#39;</span>
-            <span class="s">&#39;ujes&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;uj&#39;</span><span class="p">)</span>
+            <span class="s">&#39;ujes&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;uj&#39;</span><span class="p">)</span>
             <span class="s">&#39;nivsi&#39;</span>
-            <span class="s">&#39;nis&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ni&#39;</span><span class="p">)</span>
+            <span class="s">&#39;nis&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ni&#39;</span><span class="p">)</span>
             <span class="s">&#39;snega&#39;</span>
             <span class="s">&#39;snemu&#39;</span>
             <span class="s">&#39;snem&#39;</span>
-            <span class="s">&#39;sneg&#39;</span>          <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;sn&#39;</span><span class="p">)</span>
+            <span class="s">&#39;sneg&#39;</span>          <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;sn&#39;</span><span class="p">)</span>
             <span class="s">&#39;tavsi&#39;</span>
-            <span class="s">&#39;tas&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;ta&#39;</span><span class="p">)</span>
+            <span class="s">&#39;tas&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;ta&#39;</span><span class="p">)</span>
             <span class="s">&#39;ajuci&#39;</span>
             <span class="s">&#39;avsi&#39;</span>
             <span class="s">&#39;ase&#39;</span>
-            <span class="s">&#39;as&#39;</span>            <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+            <span class="s">&#39;as&#39;</span>            <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
             <span class="s">&#39;ijes&#39;</span>
             <span class="s">&#39;ivsi&#39;</span>
             <span class="s">&#39;ieci&#39;</span>
-            <span class="s">&#39;is&#39;</span>            <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;i&#39;</span><span class="p">)</span>
-            <span class="s">&#39;es&#39;</span>            <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;e&#39;</span><span class="p">)</span>
+            <span class="s">&#39;is&#39;</span>            <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;i&#39;</span><span class="p">)</span>
+            <span class="s">&#39;es&#39;</span>            <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;e&#39;</span><span class="p">)</span>
             <span class="s">&#39;nuvsi&#39;</span>
             <span class="s">&#39;nuci&#39;</span>
-            <span class="s">&#39;nes&#39;</span>           <span class="p">(</span><span class="n">R2</span> <span class="o">&lt;-</span><span class="s">&#39;n&#39;</span><span class="p">)</span>
+            <span class="s">&#39;nes&#39;</span>           <span class="p">(</span><span class="n">no_diacritics</span> <span class="o">&lt;-</span><span class="s">&#39;n&#39;</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="p">)</span>
-    
+
     <span class="kd">define</span> <span class="n">Step_3</span> <span class="k">as</span> <span class="p">(</span>
         <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="n">R1</span> <span class="k">among</span> <span class="p">(</span>
             <span class="s">&#39;enom&#39;</span>
