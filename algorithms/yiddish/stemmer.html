@@ -352,6 +352,7 @@ Finally, all remaining GE and TSU are deleted.
        <span class="n">prelude</span>
        <span class="n">mark_regions</span>
        <span class="n">R1</span>
+       <span class="n">R1plus3</span>
        <span class="n">standard_suffix</span>
 <span class="p">)</span>
 
@@ -448,8 +449,10 @@ Finally, all remaining GE and TSU are deleted.
   <span class="p">(</span>
     <span class="ow">try</span> <span class="p">(</span>
       <span class="c1">// Replace past participle ge- at start of word</span>
-      <span class="p">[</span><span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span>
-         <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;GE&#39;</span> <span class="p">)</span>
+      <span class="c1">// Unless word starts with gelt- or gebn-</span>
+      <span class="ow">test</span> <span class="p">(</span><span class="s">&#39;{Giml}{Ayen}{Lamed}{Tes}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Giml}{Ayen}{Beys}{Nun}&#39;</span><span class="p">)</span>
+        <span class="ow">or</span>
+      <span class="p">([</span><span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;GE&#39;</span> <span class="p">)</span>
     <span class="p">)</span>
 
     <span class="ow">try</span> <span class="p">(</span>
@@ -466,8 +469,11 @@ Finally, all remaining GE and TSU are deleted.
 
         <span class="c1">// If verbal prefix followed by Tsu- or Ge-, replace it</span>
         <span class="p">(</span>
-
-          <span class="p">((</span><span class="s">&#39;{Tsadek}{Vov}{Giml}{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Tes}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Nun}&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="p">(</span><span class="ow">hop</span> <span class="m">1</span><span class="p">)</span> <span class="ow">hop</span> <span class="o">-</span><span class="m">4</span><span class="p">)</span>
+          <span class="c1">// Don&#39;t mark the TSU- prefix inside verbs like &quot;oys-tsugn&quot;</span>
+          <span class="ow">test</span> <span class="p">((</span><span class="s">&#39;{Tsadek}{Vov}{Giml}{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Tes}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Tsadek}{Vov}{Kuf}{Nun}&#39;</span><span class="p">)</span> <span class="ow">atlimit</span><span class="p">)</span>
+          <span class="ow">or</span>
+          <span class="c1">// Don&#39;t mark the GE- prefix inside verbs like &quot;avek-gebn&quot;</span>
+          <span class="ow">test</span> <span class="p">(</span><span class="s">&#39;{Giml}{Ayen}{Beys}{Nun}&#39;</span><span class="p">)</span>
           <span class="ow">or</span>
           <span class="p">(</span> <span class="p">[</span><span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;GE&#39;</span><span class="p">)</span>
           <span class="ow">or</span>
@@ -499,6 +505,8 @@ Finally, all remaining GE and TSU are deleted.
 
 <span class="kd">backwardmode</span> <span class="p">(</span>
   <span class="kd">define</span> <span class="n">R1</span> <span class="k">as</span> <span class="o">$</span><span class="n">p1</span> <span class="o">&lt;=</span> <span class="ow">cursor</span>
+  <span class="c1">// Like R1, but also allows the cursor to be outside R1 by the width of Giml Yud Samekh</span>
+  <span class="kd">define</span> <span class="n">R1plus3</span> <span class="k">as</span> <span class="o">$</span><span class="n">p1</span> <span class="o">&lt;=</span> <span class="ow">cursor</span> <span class="o">+</span> <span class="ow">sizeof</span> <span class="s">&#39;{Giml}{Yud}{Samekh}&#39;</span>
 
   <span class="kd">define</span> <span class="n">standard_suffix</span> <span class="k">as</span> <span class="p">(</span>
     <span class="ow">do</span> <span class="p">(</span>
@@ -581,12 +589,14 @@ Finally, all remaining GE and TSU are deleted.
         <span class="c1">// If the Tes was before R1, we try to perform the same action while leaving the Tes in place</span>
         <span class="s">&#39;{Tes}{Nun}&#39;</span> <span class="s">&#39;{Tes}{Ayen}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Reysh}&#39;</span> <span class="s">&#39;{Tes}{Samekh}&#39;</span>
         <span class="s">&#39;{Tes}{Nun}{Samekh}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}{Mem}&#39;</span> <span class="s">&#39;{Tes}{Ayen}{Nun}{Ayen}{Reysh}&#39;</span>
-          <span class="p">(</span> <span class="ow">not</span> <span class="p">(</span><span class="n">R1</span> <span class="ow">delete</span>
-              <span class="c1">// -gebrakht =&gt; -breng</span>
-              <span class="ow">not</span> <span class="p">([</span><span class="s">&#39;{Giml}{Ayen}{Beys}{Reysh}{Alef}{Khof}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Beys}{Reysh}{Alef}{Khof}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Reysh}{Ayen}{Nun}{Giml}&#39;</span><span class="p">)</span>
-              <span class="p">)</span>
-              <span class="ow">repeat</span> <span class="p">(</span><span class="ow">hop</span> <span class="o">-</span><span class="m">1</span><span class="p">)</span>
-              <span class="p">[</span><span class="s">&#39;{Ayen}{Nun}{Ayen}{Reysh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}{Mem}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Nun}{Ayen}&#39;</span> <span class="ow">or</span><span class="s">&#39;{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}{Reysh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}{Samekh}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Ayen}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Samekh}&#39;</span><span class="p">]</span> <span class="n">R1</span> <span class="ow">delete</span><span class="p">)</span> 
+          <span class="p">(</span> <span class="p">((</span><span class="n">R1</span> <span class="ow">delete</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="o">&lt;-</span> <span class="s">&#39;{Tes}&#39;</span><span class="p">))</span>
+            <span class="c1">// -(ge)brakht =&gt; -breng</span>
+            <span class="p">[</span><span class="s">&#39;{Beys}{Reysh}{Alef}{Khof}&#39;</span> <span class="ow">try</span> <span class="s">&#39;{Giml}{Ayen}&#39;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s">&#39;{Beys}{Reysh}{Ayen}{Nun}{Giml}&#39;</span>
+          <span class="p">)</span>
+
+        <span class="c1">// Past participles: -et, -etn, -ets, -ete, -eter</span>
+        <span class="s">&#39;{Ayen}{Tes}&#39;</span> <span class="s">&#39;{Ayen}{Tes}{Nun}&#39;</span> <span class="s">&#39;{Ayen}{Tes}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Tes}{Ayen}&#39;</span> <span class="s">&#39;{Ayen}{Tes}{Ayen}{Reysh}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
 
         <span class="c1">// -geyn shorted to -gey</span>
         <span class="s">&#39;{Giml}{TsveyYudn}{Nun}&#39;</span>
@@ -723,13 +733,18 @@ Finally, all remaining GE and TSU are deleted.
         <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Khof}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}&#39;</span> <span class="s">&#39;{Lamed}{Ayen}{Khof}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Samekh}&#39;</span> <span class="s">&#39;{Ayen}{Lamed}{Ayen}{Nun}&#39;</span>
            <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
         
-        <span class="c1">// Noun ending: -ist, -istn</span>
-        <span class="s">&#39;{Yud}{Samekh}{Tes}&#39;</span> <span class="s">&#39;{Yud}{Samekh}{Tes}{Nun}&#39;</span>
-          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+        <span class="c1">// Noun ending: -ist</span>
+        <span class="s">&#39;{Yud}{Samekh}{Tes}&#39;</span>
+          <span class="p">(</span>
+            <span class="c1">// Exceptions: -gist, -shist</span>
+            <span class="p">(</span> <span class="p">(</span><span class="s">&#39;{Giml}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Shin}&#39;</span><span class="p">)</span> <span class="ow">try</span> <span class="p">(</span><span class="n">R1plus3</span> <span class="o">&lt;-</span> <span class="s">&#39;{Yud}{Samekh}&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="ow">or</span>
+            <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+          <span class="p">)</span>
 
-        <span class="c1">// Exceptions to above: -gist, -shist</span>
-        <span class="s">&#39;{Giml}{Yud}{Samekh}{Tes}&#39;</span> <span class="s">&#39;{Shin}{Yud}{Samekh}{Tes}&#39;</span>
-          <span class="p">(</span> <span class="ow">hop</span> <span class="o">-</span><span class="m">4</span> <span class="p">[</span><span class="s">&#39;{Tes}&#39;</span><span class="p">]</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
+        <span class="c1">// Noun ending: -istn</span>
+        <span class="s">&#39;{Yud}{Samekh}{Tes}{Nun}&#39;</span>
+          <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
         
         <span class="c1">// Verb ending: -stu</span>
         <span class="s">&#39;{Samekh}{Tes}{Vov}&#39;</span>
@@ -759,7 +774,7 @@ Finally, all remaining GE and TSU are deleted.
 
     <span class="ow">do</span> <span class="p">(</span>
       <span class="p">[</span><span class="ow">substring</span><span class="p">]</span> <span class="k">among</span><span class="p">(</span>
-        <span class="c1">// Adjective endings: -ig, -ik, -ish, -nik</span>
+        <span class="c1">// Adjective endings: -ig, -ik, -ish, -nik, -dik</span>
         <span class="s">&#39;{Yud}{Giml}&#39;</span> <span class="s">&#39;{Yud}{Kuf}&#39;</span> <span class="s">&#39;{Yud}{Shin}&#39;</span> <span class="s">&#39;{Nun}{Yud}{Kuf}&#39;</span> <span class="s">&#39;{Dalet}{Yud}{Kuf}&#39;</span>
           <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
 
@@ -774,10 +789,7 @@ Finally, all remaining GE and TSU are deleted.
         <span class="c1">// Present participle ending -endik: delete if after a -ng, -nk, -n, -m, consonant+l, or vowel.</span>
         <span class="c1">// Otherwise, delete just the -ndik part.</span>
         <span class="s">&#39;{Ayen}{Nun}{Dalet}{Yud}{Kuf}&#39;</span>
-           <span class="p">(</span> <span class="n">R1</span> 
-             <span class="ow">not</span> <span class="p">(</span><span class="ow">test</span><span class="p">(</span><span class="s">&#39;{Nun}{Giml}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}{Kuf}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Nun}&#39;</span> <span class="ow">or</span> <span class="s">&#39;{Mem}&#39;</span> <span class="ow">or</span> <span class="p">(</span><span class="s">&#39;Lamed&#39;</span> <span class="n">consonant</span><span class="p">)</span> <span class="ow">or</span> <span class="n">vowel</span><span class="p">)</span> <span class="ow">delete</span><span class="p">)</span>
-             <span class="ow">hop</span> <span class="o">-</span><span class="m">5</span> <span class="s">&#39;{Nun}{Dalet}{Yud}{Kuf}&#39;</span> <span class="ow">delete</span>
-           <span class="p">)</span>
+           <span class="p">(</span> <span class="n">R1</span> <span class="ow">delete</span> <span class="p">)</span>
       <span class="p">)</span>
     <span class="p">)</span>
 
